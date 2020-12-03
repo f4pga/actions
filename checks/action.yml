@@ -1,0 +1,5 @@
+name: 'Checks'
+description: "Run license and linting checks"
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
