@@ -1,5 +1,30 @@
 name: 'Checks'
 description: "Run license and linting checks"
+
+inputs:
+
+  licenseExclude:
+    description: 'List of dir/file patterns to exclude from the license check'
+    default: >
+      */.*/*
+      */build/*
+      */env/*
+      */src/*
+      */third_party/*
+      */*/__init__.py
+      ./miniconda.sh
+
+  pythonExclude:
+    description: 'List of dir/file patterns to exclude from the Python linting check'
+    default: >
+      */.*/*
+      */build/*
+      */env/*
+      */src/*
+      */third_party/*
+      */*/__init__.py
+      ./miniconda.sh
+
 runs:
   using: 'docker'
   image: 'Dockerfile'
