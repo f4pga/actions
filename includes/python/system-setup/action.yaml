@@ -1,0 +1,116 @@
+# Copyright (C) 2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Setup system for package"
+description: "Set up system with Python environment and dependencies ready for the package."
+inputs:
+  python-version:
+    description: 'Python version to use.'
+    required: true
+    default: 3.x
+  os:
+    description: 'Operating system in use.'
+    required: true
+    default: ubuntu-latest
+
+  packaging-tools:
+    description: 'Install the tools required for packaging.'
+    required: false
+    default: false
+
+  # OS dependencies
+  system-dependencies:
+    description: 'Install the system dependencies on the operating system.'
+    required: true
+    default: true
+  run-dependencies-ubuntu:
+    description: 'Packages which need to be installed for Python package to run on Ubuntu.'
+    required: false
+    default: ''
+  run-dependencies-mac:
+    description: 'Packages which need to be installed for Python package to run on Mac OS X.'
+    required: false
+    default: ''
+  run-dependencies-windows:
+    description: 'Packages which need to be installed for Python package to run on Windows.'
+    required: false
+    default: ''
+
+  development-tools:
+    description: 'Install the tools required for development.'
+    required: true
+    default: false
+  dev-dependencies-ubuntu:
+    description: 'Packages which need to be installed for Python package to be developed on Ubuntu.'
+    required: false
+    default: ''
+  dev-dependencies-mac:
+    description: 'Packages which need to be installed for Python package to be developed on Ubuntu.'
+    required: false
+    default: ''
+  dev-dependencies-windows:
+    description: 'Packages which need to be installed for Python package to be developed on Ubuntu.'
+    required: false
+    default: ''
+
+runs:
+  using: "includes"
+
+  steps:
+  - name: 🐍 Set up Python ${{ matrix.python-version }}
+    uses: actions/setup-python@v2
+    with:
+      python-version: ${{ inputs.python-version }}
+
+  - name: Install latest pip
+    run: |
+      pip install -U pip
+
+  - name: Install packaging tooling
+    if: inputs.packaging-tools
+    run: |
+      pip install twine auditwheel build
+
+  # Install run dependencies
+  - name: Install package's system dependencies (Ubuntu)
+    if: inputs.system-dependencies && inputs.run-dependencies-ubuntu && startsWith(inputs.os, 'ubuntu')
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y ${{ inputs.run-dependencies-ubuntu }}
+
+  - name: Install package's system dependencies (Mac OS X)
+    if: inputs.system-dependencies && inputs.run-dependencies-mac && startsWith(inputs.os, 'macos')
+    run: |
+      true
+
+  - name: Install package's system dependencies (Windows)
+    if: inputs.system-dependencies && inputs.run-dependencies-windows && startsWith(inputs.os, 'windows')
+    run: |
+      true
+
+  # Install developer tooling dependencies
+  - name: Install developer tooling's system dependencies (Ubuntu)
+    if: inputs.development-tools && inputs.dev-dependencies-ubuntu && startsWith(inputs.os, 'ubuntu')
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y ${{ inputs.dev-dependencies-ubuntu }}
+
+  - name: Install developer tooling's system dependencies (Mac OS X)
+    if: inputs.development-tools && inputs.dev-dependencies-mac && startsWith(inputs.os, 'macos')
+    run: |
+      true
+
+  - name: Install developer tooling's system dependencies (Windows)
+    if: inputs.development-tools && inputs.dev-dependencies-windows && startsWith(inputs.os, 'windows')
+    run: |
+      true
+
+  - name: Install development tools
+    if: inputs.development-tools
+    run: |
+      pip install -r requirements.txt

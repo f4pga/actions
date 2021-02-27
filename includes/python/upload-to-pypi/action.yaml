@@ -1,0 +1,66 @@
+# Copyright (C) 2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Check and then upload packages into PyPI"
+description: "Check the packages and then publish packages onto Test and real versions."
+inputs:
+  type:
+    description: 'Type of packages to publish to PyPi.'
+    required: true
+  root_user:
+    description: 'Repository name that should be publishing packages to PyPi.'
+    required: true
+  root_branch:
+    description: 'Default branch to publish packages from.'
+    required: true
+    default: refs/heads/master
+
+runs:
+  using: "includes"
+
+  steps:
+  - name: ✔︎ Check 📦
+    run: |
+      for WHEEL in dist/*.whl; do
+        echo
+        echo "::group::Checking $WHEEL"
+        echo
+        python -m zipfile --list $WHEEL
+        echo
+        auditwheel show $WHEEL
+        echo
+        twine check $WHEEL
+        echo
+        echo "::endgroup::"
+      done
+
+  - name: Upload wheel
+    uses: actions/upload-artifact@v2
+    with:
+      name: ${{ inputs.type }}-${{ runner.os }}
+      path: dist
+
+  - name: 📤 Publish ${{ inputs.type }} to Test PyPI
+    env:
+      TWINE_USERNAME: __token__
+      TWINE_PASSWORD: ${{ secrets.PYPI_TEST_PASSWORD }}
+    if: env.TWINE_PASSWORD != null
+    run: |
+      twine upload --skip-existing --verbose --repository testpypi dist/*
+
+  - name: 📤 Publish source to PyPI
+    if: |
+        (github.ref == inputs.root_branch) &&
+        (github.event_name != 'pull_request') &&
+        startsWith(inputs.root_user, github.repository) &&
+        env.TWINE_PASSWORD != null
+    env:
+      TWINE_USERNAME: __token__
+      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+    run: |
+      twine upload dist/*

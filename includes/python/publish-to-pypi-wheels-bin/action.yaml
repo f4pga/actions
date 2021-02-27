@@ -1,0 +1,96 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Publish wheels for (binary) packages on PyPI"
+description: ""
+inputs:
+  root_user:
+    description: 'Repository name that should be publishing packages to PyPi.'
+    required: true
+    default: SymbiFlow
+  root_branch:
+    description: 'Default branch to publish packages from.'
+    required: true
+    default: refs/heads/master
+  python-version:
+    description: 'Python version to publish for.'
+    required: true
+  os:
+    description: 'OS to use'
+    required: true
+
+
+runs:
+  using: "includes"
+
+  steps:
+  # Linux -- manylinux
+  # ----------------------------------------------------------------------
+  - name: Workout manylinux-version
+    id: manylinux
+    if: startswith(inputs.os, 'ubuntu')
+    shell: python
+    env:
+      PYTHON_VERSION: ${{ inputs.python-version }}
+    run: |
+      import os
+      MANYLINUX = {
+          "3.6": "cp36-cp36m",
+          "3.7": "cp37-cp37m",
+          "3.8": "cp38-cp38",
+          "3.9": "cp39-cp39",
+      }[os.environ['PYTHON_VERSION']]
+      print("::set-output name=version::"+MANYLINUX)
+
+  - name: 🚧 Build distribution 📦
+    uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2010_x86_64
+    if: startswith(inputs.os, 'ubuntu')
+    with:
+      build-requirements: 'cython'
+      pre-build-command: 'bash .github/workflows/manylinux-install-cmake.sh'
+      python-versions: ${{ steps.manylinux.outputs.version }}
+      #pip-wheel-args: '-w ./dist --no-deps --verbose'
+
+  - name: List distribution 📦
+    if: startswith(inputs.os, 'ubuntu')
+    run: |
+      # Fix permissions
+      echo "::group::Fixing permission"
+      ls -l dist/*
+      echo $USER
+      whoami
+      sudo chown -R $USER dist
+      ls -l dist/*
+      echo "::endgroup::"
+      # Remove the non-manylinux versions
+      rm -v dist/*linux_x86_64*.whl
+      ls -l dist/*
+  # ----------------------------------------------------------------------
+
+  # Windows + Mac
+  # ----------------------------------------------------------------------
+  - includes: ./includes/python/system-setup
+    if: ${{ !startswith(inputs.os, 'ubuntu') }}
+    with:
+      python-version: ${{ inputs.python-version }}
+      packaging-tools: true
+
+  - name: 🚧 Build distribution 📦
+    if: ${{ !startswith(inputs.os, 'ubuntu') }}
+    run: |
+      python -m build --wheel .
+  # ----------------------------------------------------------------------
+
+  # Upload the packages
+  # ----------------------------------------------------------------------
+  - includes: ./includes/python/upload-to-pypi
+    with:
+      root_user: ${{ inputs.repo_user }}
+      root_branch: ${{ inputs.repo_branch }}
+      type: wheels
+  # ----------------------------------------------------------------------

@@ -1,0 +1,44 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Build (binary) packages for PyPI"
+
+on:
+  push:
+  pull_request:
+
+
+jobs:
+
+  Source:
+    name: Source
+    runs-on: ubuntu-20.04
+
+    steps:
+    - includes: ./includes/python/publish-to-pypi-src
+      with:
+        root_user: SymbiFlow
+
+  Wheels:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
+      fail-fast: false
+
+    name: '${{ matrix.python-version }} • ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - includes: ./includes/python/publish-to-pypi-wheels-bin
+      with:
+        python-version: ${{ matrix.python-version }}
+        os: ${{ matrix.os }}
+        root_user: SymbiFlow
