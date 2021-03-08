@@ -25,6 +25,7 @@ runs:
   - includes: ./includes/python/system-setup
     with:
       packaging-tools: true
+      development-tools: true
 
   - name: 🚧 Build distribution 📦
     run: |
