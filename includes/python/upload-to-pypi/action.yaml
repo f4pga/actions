@@ -26,6 +26,7 @@ runs:
   steps:
   - name: ✔︎ Check 📦
     if: inputs.type == 'wheels'
+    shell: bash
     run: |
       for WHEEL in dist/*.whl; do
         echo
