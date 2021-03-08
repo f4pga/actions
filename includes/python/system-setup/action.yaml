@@ -74,7 +74,7 @@ runs:
   - name: Install packaging tooling
     if: inputs.packaging-tools
     run: |
-      pip install twine auditwheel build
+      pip install twine wheel auditwheel build
 
   # Install run dependencies
   - name: Install package's system dependencies (Ubuntu)
