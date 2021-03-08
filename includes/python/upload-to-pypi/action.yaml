@@ -32,7 +32,7 @@ runs:
         echo
         echo "::group::Checking $WHEEL"
         echo
-        python -m zipfile --list $WHEEL
+        python -m zipfile -l $WHEEL
         echo
         if [ "$(uname)" = "Linux" ]; then
           auditwheel show $WHEEL
