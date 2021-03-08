@@ -57,7 +57,17 @@ runs:
 
   - name: Install packaging tooling on runner
     run: |
+      echo "$HOME/.local/bin" >> $GITHUB_PATH
+      export PATH=$HOME/.local/bin:$PATH
       pip install -U pip twine wheel auditwheel
+
+  - name: Check packaging tooling on runner
+    run: |
+      echo $PATH
+      which pip
+      which twine
+      which wheel
+      which auditwheel
 
   - name: Workout manylinux-version
     id: manylinux
