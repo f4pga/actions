@@ -32,6 +32,7 @@ runs:
         echo
         echo "::group::Checking $WHEEL"
         echo
+        python -m zipfile -t $WHEEL
         python -m zipfile -l $WHEEL
         echo
         if [ "$(uname)" = "Linux" ]; then
@@ -52,6 +53,7 @@ runs:
         echo
         echo "::group::Checking $SRC"
         echo
+        python -m zipfile --test $SRC
         python -m zipfile --list $SRC
         echo
         twine check $SRC
