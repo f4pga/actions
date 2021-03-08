@@ -55,6 +55,10 @@ runs:
       echo
       exit 1
 
+  - name: Install packaging tooling on runner
+    run: |
+      pip install -U pip twine wheel auditwheel
+
   - name: Workout manylinux-version
     id: manylinux
     shell: python
