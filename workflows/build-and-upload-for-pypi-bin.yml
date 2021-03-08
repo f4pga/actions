@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Build (binary) packages for PyPI"
+name: "Build (binary) packages and publish on PyPI"
 
 on:
   push:
@@ -24,10 +24,27 @@ jobs:
       with:
         root_user: SymbiFlow
 
-  Wheels:
+  Wheels-Linux:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
+      fail-fast: false
+
+    name: '${{ matrix.python-version }} • manylinux'
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - includes: ./includes/python/publish-to-pypi-wheels-bin-linux
+      with:
+        python-version: ${{ matrix.python-version }}
+        root_user: SymbiFlow
+
+  Wheels-Other:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
         python-version: [ '3.6', '3.7', '3.8', '3.9' ]
       fail-fast: false
 
@@ -37,8 +54,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - includes: ./includes/python/publish-to-pypi-wheels-bin
+    - includes: ./includes/python/publish-to-pypi-wheels-bin-other
       with:
         python-version: ${{ matrix.python-version }}
-        os: ${{ matrix.os }}
         root_user: SymbiFlow
