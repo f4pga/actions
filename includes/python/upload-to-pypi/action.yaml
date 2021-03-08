@@ -34,7 +34,9 @@ runs:
         echo
         python -m zipfile --list $WHEEL
         echo
-        auditwheel show $WHEEL
+        if [ "$(uname)" = "Linux" ]; then
+          auditwheel show $WHEEL
+        fi
         echo
         twine check $WHEEL
         echo
