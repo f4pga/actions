@@ -25,6 +25,7 @@ runs:
 
   steps:
   - name: ✔︎ Check 📦
+    if: inputs.type == 'wheels'
     run: |
       for WHEEL in dist/*.whl; do
         echo
@@ -35,6 +36,32 @@ runs:
         auditwheel show $WHEEL
         echo
         twine check $WHEEL
+        echo
+        echo "::endgroup::"
+      done
+
+  - name: ✔︎ Check 📦
+    if: inputs.type == 'source'
+    shell: bash
+    run: |
+      shopt -s nullglob
+      for SRC in dist/*.zip; do
+        echo
+        echo "::group::Checking $SRC"
+        echo
+        python -m zipfile --list $SRC
+        echo
+        twine check $SRC
+        echo
+        echo "::endgroup::"
+      done
+      for SRC in dist/*.t*gz; do
+        echo
+        echo "::group::Checking $SRC"
+        echo
+        python -m tarfile --list $SRC
+        echo
+        twine check $SRC
         echo
         echo "::endgroup::"
       done
