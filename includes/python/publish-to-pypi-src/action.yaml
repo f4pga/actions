@@ -28,7 +28,7 @@ runs:
 
   - name: 🚧 Build distribution 📦
     run: |
-      python -m build --sdist .
+      python -m build --sdist --no-isolation .
 
   - includes: ./includes/python/upload-to-pypi
     with:
