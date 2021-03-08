@@ -20,6 +20,21 @@ inputs:
   python-version:
     description: 'Python version to publish for.'
     required: true
+  build-requirements:
+    description: 'Python (pip) packages required at build time, space-separated'
+    default:
+  system-packages:
+    description: 'System (yum) packages required at build time, space-separated'
+    default:
+  pre-build-command:
+    description: 'Command to run before build, e.g. the execution of a script to perform additional build-environment setup'
+    default:
+  package-path:
+    description: 'Path to python package to build (e.g. where setup.py file is located), relative to repository root'
+    default: ''
+  pip-wheel-args:
+    description: 'Extra extra arguments to pass to the pip wheel command (see pip documentation), passed paths are relative to package-path'
+    default: -w ./dist --no-deps --verbose
 
 
 runs:
@@ -58,10 +73,12 @@ runs:
   - name: 🚧 Build distribution 📦
     uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2010_x86_64
     with:
-      build-requirements: 'cython'
-      pre-build-command: 'bash .github/workflows/manylinux-install-cmake.sh'
+      build-requirements: ${{ inputs.build-requirements }}
+      system-packages: ${{ inputs.system-packages }}
       python-versions: ${{ steps.manylinux.outputs.version }}
-      #pip-wheel-args: '-w ./dist --no-deps --verbose'
+      pre-build-command: ${{ inputs.pre-build-command }}
+      package-path: ${{ inputs.package-path }}
+      pip-wheel-args: ${{ inputs.pip-wheel-args }}
 
   - name: List distribution 📦
     run: |
