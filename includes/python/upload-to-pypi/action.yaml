@@ -28,6 +28,7 @@ runs:
     if: inputs.type == 'wheels'
     shell: bash
     run: |
+      PYVER=$(python2 -c "import sys; print(sys.version[0])")
       for WHEEL in dist/*.whl; do
         echo
         echo "::group::Checking $WHEEL"
@@ -35,7 +36,7 @@ runs:
         python -m zipfile -t $WHEEL
         python -m zipfile -l $WHEEL
         echo
-        if [ "$(uname)" = "Linux" ]; then
+        if [ "$(uname)" = "Linux" -a $PYVER -eq 3 ]; then
           auditwheel show $WHEEL
         fi
         echo
