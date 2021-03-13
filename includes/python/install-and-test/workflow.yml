@@ -144,7 +144,7 @@ jobs:
     - name: 📥 Download source 📦
       uses: actions/download-artifact@v2
       with:
-        name: source-${{ runner.os }}
+        name: source
         path: dist
 
     - name: Installing using the source 📦

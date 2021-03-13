@@ -26,6 +26,7 @@ runs:
   using: "includes"
 
   steps:
+  # Check and upload wheels
   - name: ✔︎ Check wheels 📦
     if: inputs.type == 'wheels'
     shell: bash
@@ -47,6 +48,14 @@ runs:
         echo "::endgroup::"
       done
 
+  - name: 📤 Upload wheels 📦
+    if: inputs.type == 'wheels'
+    uses: actions/upload-artifact@v2
+    with:
+      name: ${{ inputs.type }}-${{ runner.os }}
+      path: dist
+
+  # Check and upload source package
   - name: ✔︎ Check source 📦
     if: inputs.type == 'source'
     shell: bash
@@ -74,12 +83,14 @@ runs:
         echo "::endgroup::"
       done
 
-  - name: 📤 Upload ${{ inputs.type }} 📦
+  - name: 📤 Upload source 📦
+    if: inputs.type == 'source'
     uses: actions/upload-artifact@v2
     with:
-      name: ${{ inputs.type }}-${{ runner.os }}
+      name: ${{ inputs.type }}
       path: dist
 
+  # Publish to PyPI if requested.
   - name: 📤 Publish ${{ inputs.type }} to Test PyPI
     env:
       TWINE_USERNAME: __token__
