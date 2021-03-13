@@ -69,7 +69,7 @@ runs:
 
   - name: Install latest pip
     run: |
-      pip install -U pip
+      pip install -U pip wheel virtualenv
 
   - name: Install packaging tooling
     if: inputs.packaging-tools
