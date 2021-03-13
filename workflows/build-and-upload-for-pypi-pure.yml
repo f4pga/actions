@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Build (pure python) packages ad publish on PyPI"
+name: "Build (pure python) packages and publish on PyPI"
 
 on:
   push:
