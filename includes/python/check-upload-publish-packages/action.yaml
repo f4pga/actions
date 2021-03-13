@@ -6,25 +6,27 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Check and then upload packages into PyPI"
-description: "Check the packages and then publish packages onto Test and real versions."
+name: "Check and then upload packages (and potentially publish to PyPI)"
+description: "Check the (already built) and upload packages as artifacts (and potentially publish onto Test and real PyPI servers)."
 inputs:
   type:
-    description: 'Type of packages to publish to PyPi.'
+    description: 'Type of packages.'
     required: true
+  publish:
+    description: 'Publish packages to PyPI.'
+    default: false
   root_user:
-    description: 'Repository name that should be publishing packages to PyPi.'
-    required: true
+    description: "Publish to PyPI from given user's repository."
+    default:
   root_branch:
-    description: 'Default branch to publish packages from.'
-    required: true
+    description: 'Publish to PyPI on provided branch.'
     default: refs/heads/master
 
 runs:
   using: "includes"
 
   steps:
-  - name: ✔︎ Check 📦
+  - name: ✔︎ Check wheels 📦
     if: inputs.type == 'wheels'
     shell: bash
     run: |
@@ -45,7 +47,7 @@ runs:
         echo "::endgroup::"
       done
 
-  - name: ✔︎ Check 📦
+  - name: ✔︎ Check source 📦
     if: inputs.type == 'source'
     shell: bash
     run: |
@@ -72,7 +74,7 @@ runs:
         echo "::endgroup::"
       done
 
-  - name: Upload wheel
+  - name: 📤 Upload ${{ inputs.type }} 📦
     uses: actions/upload-artifact@v2
     with:
       name: ${{ inputs.type }}-${{ runner.os }}
@@ -82,16 +84,20 @@ runs:
     env:
       TWINE_USERNAME: __token__
       TWINE_PASSWORD: ${{ secrets.PYPI_TEST_PASSWORD }}
-    if: env.TWINE_PASSWORD != null
+    if: |
+        inputs.publish &&
+        (github.ref == inputs.root_branch) &&
+        (env.TWINE_PASSWORD != null)
     run: |
       twine upload --skip-existing --verbose --repository testpypi dist/*
 
-  - name: 📤 Publish source to PyPI
+  - name: 📤 Publish $${{ inputs.type }} to PyPI
     if: |
+        inputs.publish &&
         (github.ref == inputs.root_branch) &&
-        (github.event_name != 'pull_request') &&
         startsWith(inputs.root_user, github.repository) &&
-        env.TWINE_PASSWORD != null
+        (github.event_name != 'pull_request') &&
+        (env.TWINE_PASSWORD != null)
     env:
       TWINE_USERNAME: __token__
       TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

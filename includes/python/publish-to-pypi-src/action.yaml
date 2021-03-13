@@ -31,8 +31,9 @@ runs:
     run: |
       python -m build --sdist --no-isolation .
 
-  - includes: ./includes/python/upload-to-pypi
+  - includes: ./includes/python/check-upload-publish-packages
     with:
+      type: source
+      publish: true
       root_user: ${{ inputs.root_user }}
       root_branch: ${{ inputs.root_branch }}
-      type: source

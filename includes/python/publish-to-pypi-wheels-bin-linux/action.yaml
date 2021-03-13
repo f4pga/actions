@@ -111,9 +111,10 @@ runs:
 
   # Upload the packages
   # ----------------------------------------------------------------------
-  - includes: ./includes/python/upload-to-pypi
+  - includes: ./includes/python/check-upload-publish-packages
     with:
+      type: wheels
+      publish: true
       root_user: ${{ inputs.root_user }}
       root_branch: ${{ inputs.root_branch }}
-      type: wheels
   # ----------------------------------------------------------------------

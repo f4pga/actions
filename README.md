@@ -12,7 +12,7 @@ Runs license and python linting checks.
  * `includes/python/publish-to-pypi-wheels-bin-linux` - Action to push binary wheel packages for Linux to PyPI.
  * `includes/python/publish-to-pypi-wheels-bin-other` - Action to push binary wheel packages for Mac & Windows to PyPI.
  * `includes/python/system-setup` - Action to setup a system with Python and dependencies.
- * `includes/python/upload-to-pypi` - Action which uploads already built packages (from the other `python-to-pypi-XXXX` actions).
+ * `includes/python/check-upload-publish-packages` - Action which uploads already built packages (from the other `python-to-pypi-XXXX` actions).
 
 # Example workflows
 

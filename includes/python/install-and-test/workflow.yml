@@ -117,15 +117,14 @@ jobs:
         os: ${{ matrix.os }}
         packaging-tools: true
 
-    - name: Build wheel
+    - name: 🚧 Build source 📦
       run: |
         python -m build --sdist
 
-    - name: Upload wheel
-      uses: actions/upload-artifact@v2
+    - includes: ./includes/python/check-upload-publish-packages
       with:
-        name: fasm-sdist
-        path: dist
+        type: source
+        publish: false
 
   sdist:
     strategy:
@@ -142,13 +141,13 @@ jobs:
         os: ${{ matrix.os }}
         git-checkout: false
 
-    - name: Download sdist
+    - name: 📥 Download source 📦
       uses: actions/download-artifact@v2
       with:
-        name: fasm-sdist
+        name: source-${{ runner.os }}
         path: dist
 
-    - name: Installing using the sdist
+    - name: Installing using the source 📦
       shell: bash
       run: |
         ls -l dist/*
@@ -173,15 +172,14 @@ jobs:
         os: ${{ matrix.os }}
         packaging-tools: true
 
-    - name: Build wheel
+    - name: 🚧 Build wheel 📦
       run: |
         python -m build --wheel
 
-    - name: Upload wheel
-      uses: actions/upload-artifact@v2
+    - includes: ./includes/python/check-upload-publish-packages
       with:
-        name: fasm-wheel-${{ matrix.os }}
-        path: dist
+        type: wheels
+        publish: false
 
   Wheel:
     strategy:
@@ -198,13 +196,13 @@ jobs:
         os: ${{ matrix.os }}
         git-checkout: false
 
-    - name: Download wheel
+    - name: 📥 Download wheel 📦
       uses: actions/download-artifact@v2
       with:
-        name: fasm-wheel-${{ matrix.os }}
+        name: wheels-${{ runner.os }}
         path: dist
 
-    - name: Installing using the wheel
+    - name: Installing using the wheel 📦
       run: |
         ls -l dist/*
         pip install --verbose dist/*.whl
