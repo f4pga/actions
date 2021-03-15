@@ -49,7 +49,7 @@ runs:
     run: |
       echo "Use"
       echo
-      echo "  SymbiFlow/actions/includes/python/publish-to-pypi-sheels-bin-other"
+      echo "  SymbiFlow/actions/includes/actions/python/publish-to-pypi-sheels-bin-other"
       echo
       echo "for Windows / Mac"
       echo
@@ -111,7 +111,7 @@ runs:
 
   # Upload the packages
   # ----------------------------------------------------------------------
-  - includes: ./includes/python/check-upload-publish-packages
+  - includes: ./includes/actions/python/check-upload-publish-packages
     with:
       type: wheels
       publish: true

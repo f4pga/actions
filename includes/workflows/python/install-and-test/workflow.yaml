@@ -203,6 +203,7 @@ jobs:
         path: dist
 
     - name: Installing using the wheel 📦
+      shell: bash
       run: |
         ls -l dist/*
         pip install --verbose dist/*.whl

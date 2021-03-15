@@ -25,7 +25,7 @@ runs:
   using: "includes"
 
   steps:
-  - includes: ./includes/python/system-setup
+  - includes: ./includes/actions/python/system-setup
     with:
       python-version: ${{ inputs.python-version }}
       packaging-tools: true
@@ -34,7 +34,7 @@ runs:
     run: |
       python -m build --wheel .
 
-  - includes: ./includes/python/check-upload-publish-packages
+  - includes: ./includes/actions/python/check-upload-publish-packages
     with:
       type: wheels
       publish: true

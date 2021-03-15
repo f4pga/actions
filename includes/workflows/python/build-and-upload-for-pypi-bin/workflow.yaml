@@ -1,0 +1,108 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Build (binary) packages and publish on PyPI"
+description: ""
+inputs:
+  root_user:
+    description: 'Repository name that should be publishing packages to PyPI.'
+    required: true
+  root_branch:
+    description: 'Default branch to publish packages from.'
+    required: true
+    default: refs/heads/master
+  python-versions:
+    description: 'Python version to publish for.'
+    required: true
+    default: [ '3.6', '3.7', '3.8', '3.9' ]
+  supports-linux:
+    description: 'Supported Linux operating systems.'
+    required: true
+    default: true
+  supports-windows:
+    description: 'Supported Windows operating systems.'
+    required: true
+    default: true
+  supports-macos:
+    description: 'Supported MacOS X operating systems.'
+    required: true
+    default: true
+  checkout-action:
+    required: true
+    default:
+      uses: actions/checkout@v2
+
+
+jobs:
+
+  Source:
+    name: Source
+    runs-on: ubuntu-20.04
+
+    steps:
+    - includes: ./includes/actions/python/publish-to-pypi-src
+      with:
+        root_user: ${{ inputs.root_user }}
+        root_branch: ${{ inputs.root_branch }}
+
+  Wheels-Linux:
+    if: ${{ inputs.supports-linux }}
+    strategy:
+      matrix:
+        python-version: ${{ inputs.python-versions }}
+      fail-fast: false
+
+    name: '${{ matrix.python-version }} • manylinux'
+    runs-on: ubuntu-20.04
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - includes: ./includes/actions/python/publish-to-pypi-wheels-bin-linux
+      with:
+        python-version: ${{ matrix.python-version }}
+        root_user: ${{ inputs.root_user }}
+        root_branch: ${{ inputs.root_branch }}
+
+  Wheels-Windows:
+    if: ${{ inputs.supports-windows }}
+    strategy:
+      matrix:
+        python-version: ${{ inputs.python-versions }}
+      fail-fast: false
+
+    name: '${{ matrix.python-version }} • Windows'
+    runs-on: windows-latest
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - includes: ./includes/actions/python/publish-to-pypi-wheels-bin-other
+      with:
+        python-version: ${{ matrix.python-version }}
+        root_user: ${{ inputs.root_user }}
+        root_branch: ${{ inputs.root_branch }}
+
+  Wheels-MacOS:
+    if: ${{ inputs.supports-macos }}
+    strategy:
+      matrix:
+        python-version: ${{ inputs.python-versions }}
+      fail-fast: false
+
+    name: '${{ matrix.python-version }} • ${{ matrix.os }}'
+    runs-on: macos-latest
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - includes: ./includes/actions/python/publish-to-pypi-wheels-bin-other
+      with:
+        python-version: ${{ matrix.python-version }}
+        root_user: ${{ inputs.root_user }}
+        root_branch: ${{ inputs.root_branch }}

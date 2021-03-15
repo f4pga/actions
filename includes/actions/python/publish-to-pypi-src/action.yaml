@@ -22,7 +22,7 @@ runs:
   using: "includes"
 
   steps:
-  - includes: ./includes/python/system-setup
+  - includes: ./includes/actions/python/system-setup
     with:
       packaging-tools: true
       development-tools: true
@@ -31,7 +31,7 @@ runs:
     run: |
       python -m build --sdist --no-isolation .
 
-  - includes: ./includes/python/check-upload-publish-packages
+  - includes: ./includes/actions/python/check-upload-publish-packages
     with:
       type: source
       publish: true

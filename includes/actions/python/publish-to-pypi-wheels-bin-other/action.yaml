@@ -34,13 +34,13 @@ runs:
     run: |
       echo "Use"
       echo
-      echo "  SymbiFlow/actions/includes/python/publish-to-pypi-sheels-bin-linux"
+      echo "  SymbiFlow/actions/includes/actions/python/publish-to-pypi-sheels-bin-linux"
       echo
       echo "for Linux"
       echo
       exit 1
 
-  - includes: ./includes/python/system-setup
+  - includes: ./includes/actions/python/system-setup
     with:
       python-version: ${{ inputs.python-version }}
       packaging-tools: true
@@ -52,7 +52,7 @@ runs:
 
   # Upload the packages
   # ----------------------------------------------------------------------
-  - includes: ./includes/python/check-upload-publish-packages
+  - includes: ./includes/actions/python/check-upload-publish-packages
     with:
       type: wheels
       publish: true
