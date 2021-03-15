@@ -6,25 +6,38 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Install and test Python module."
+name: Test after installing from...
 description: "Install in multiple ways (direct from GitHub, via pip, setup.py, packages) and then run the test suite."
 inputs:
+  module:
+    description: 'Name of Python module.'
+    required: true
   os:
     description: 'Operating systems to test on.'
     required: true
-    default: ${{ inputs.os }}
-  setup-action:
+    default:
+    - windows-latest
+    - macos-latest
+    - ubuntu-20.04
+  checkout-action:
+    required: true
+    default:
+      uses: actions/checkout@v2
+  system-setup-action:
     description: 'Local action to use to setup things.'
     required: true
-    default: /system-setup
+    default:
+      includes: ./includes/actions/python/system-setup
   test-action:
     description: 'Local action to use to run the tests.'
     required: true
-    default: /download-and-run-tests
+    default:
+      includes: /download-and-run-tests
   supports-make-test:
     description: 'Supports using `make test` to automatically setup the system and run the tests.'
     required: true
     default: true
+
 
 jobs:
 
@@ -39,17 +52,16 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - includes: ${{ inputs.setup-action }}
+    - << : ${{ inputs.system-setup-action }}
       with:
         os: ${{ matrix.os }}
-        git-checkout: false
 
     - name: Installing directly from GitHub
       shell: bash
       run: |
-        pip install --verbose git+https://github.com/${GITHUB_REPOSITORY}.git@${GITHUB_SHA}#egg=rr-graph
+        pip install --verbose git+https://github.com/${GITHUB_REPOSITORY}.git@${GITHUB_SHA}#egg=${{ inputs.module }}
 
-    - includes: ${{ inputs.test-action }}
+    - ${{ inputs.test-action }}
   # ----------------------------------------------------------------------
 
   # Install using a local checkout
@@ -59,16 +71,18 @@ jobs:
       matrix:
         os: ${{ inputs.os }}
         cmd:
-          - python setup.py install
-          - pip install --verbose .
-          - pip install --verbose -e .    # Editable install
+        - python setup.py install
+        - pip install --verbose .
+        - pip install --verbose -e .    # Editable install
       fail-fast: false
 
     name: Checkout with '${{ matrix.cmd }}' (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
 
     steps:
-    - includes: ${{ inputs.setup-action }}
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
       with:
         os: ${{ matrix.os }}
 
@@ -76,7 +90,7 @@ jobs:
       run: |
         ${{ matrix.cmd }}
 
-    - includes: ${{ inputs.test-action }}
+    - ${{ inputs.test-action }}
   # ----------------------------------------------------------------------
 
   # Install into self-contained `make-env` environment.
@@ -92,7 +106,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - includes: ${{ inputs.setup-action }}
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
       with:
         os: ${{ matrix.os }}
 
@@ -112,7 +128,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - includes: ${{ inputs.setup-action }}
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
       with:
         os: ${{ matrix.os }}
         packaging-tools: true
@@ -121,7 +139,7 @@ jobs:
       run: |
         python -m build --sdist
 
-    - includes: ./includes/python/check-upload-publish-packages
+    - includes: ./includes/actions/python/check-upload-publish-packages
       with:
         type: source
         publish: false
@@ -136,10 +154,9 @@ jobs:
     needs: BuildSdist
 
     steps:
-    - includes: ${{ inputs.setup-action }}
+    - << : ${{ inputs.system-setup-action }}
       with:
         os: ${{ matrix.os }}
-        git-checkout: false
 
     - name: 📥 Download source 📦
       uses: actions/download-artifact@v2
@@ -153,7 +170,7 @@ jobs:
         ls -l dist/*
         pip install --verbose dist/*
 
-    - includes: ${{ inputs.test-action }}
+    - ${{ inputs.test-action }}
   # ----------------------------------------------------------------------
 
   # Install from a binary wheel package
@@ -167,7 +184,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - includes: ${{ inputs.setup-action }}
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
       with:
         os: ${{ matrix.os }}
         packaging-tools: true
@@ -176,7 +195,7 @@ jobs:
       run: |
         python -m build --wheel
 
-    - includes: ./includes/python/check-upload-publish-packages
+    - includes: ./includes/actions/python/check-upload-publish-packages
       with:
         type: wheels
         publish: false
@@ -191,10 +210,9 @@ jobs:
     needs: BuildWheel
 
     steps:
-    - includes: ${{ inputs.setup-action }}
+    - << : ${{ inputs.system-setup-action }}
       with:
         os: ${{ matrix.os }}
-        git-checkout: false
 
     - name: 📥 Download wheel 📦
       uses: actions/download-artifact@v2
@@ -208,5 +226,5 @@ jobs:
         ls -l dist/*
         pip install --verbose dist/*.whl
 
-    - includes: ${{ inputs.test-action }}
+    - ${{ inputs.test-action }}
   # ----------------------------------------------------------------------

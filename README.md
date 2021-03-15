@@ -21,6 +21,10 @@ to expand it into `.github/workflow/XXXX.yml`.
     Example workflow for building and publishing a *pure* Python package to
     PyPI.
 
+ * [`examples/install-and-test.yml`](./examples/install-and-test.yml) -
+   Example workflow for making sure that a Python package runs correctly no
+   matter how it is installed.
+
 # "Includable" Workflows
 
  * [`includes/workflows/python/build-and-upload-for-pypi-bin`](./includes/workflows/python/build-and-upload-for-pypi-bin/workflow.yaml) -
@@ -29,6 +33,10 @@ to expand it into `.github/workflow/XXXX.yml`.
  * [`includes/workflows/python/build-and-upload-for-pypi-pure`](./includes/workflows/python/build-and-upload-for-pypi-pure/workflow.yaml) -
    Workflow to build and publish (pure python) package (source + wheels) on
    PyPI.
+
+ * [`includes/workflows/python/install-and-test`](./includes/workflows/python/install-and-test/workflow.yaml) -
+   Make sure that a Python package installs correctly (directly from GitHub,
+   via pip, via setup.py, etc).
 
 # "Includable" Actions
 
