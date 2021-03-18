@@ -7,13 +7,13 @@
 # SPDX-License-Identifier: ISC
 
 name: Test after installing from...
-description: "Install in multiple ways (direct from GitHub, via pip, setup.py, packages) and then run the test suite."
+description: Install in multiple ways (direct from GitHub, via pip, setup.py, packages) and then run the test suite.
 inputs:
   module:
-    description: 'Name of Python module.'
+    description: Name of Python module.
     required: true
   os:
-    description: 'Operating systems to test on.'
+    description: Operating systems to test on.
     required: true
     default:
     - windows-latest
@@ -24,17 +24,17 @@ inputs:
     default:
       uses: actions/checkout@v2
   system-setup-action:
-    description: 'Local action to use to setup things.'
+    description: Local action to use to setup things.
     required: true
     default:
       includes: ./includes/actions/python/system-setup
   test-action:
-    description: 'Local action to use to run the tests.'
+    description: Local action to use to run the tests.
     required: true
     default:
       includes: /download-and-run-tests
   supports-make-test:
-    description: 'Supports using `make test` to automatically setup the system and run the tests.'
+    description: Supports using `make test` to automatically setup the system and run the tests.
     required: true
     default: true
 

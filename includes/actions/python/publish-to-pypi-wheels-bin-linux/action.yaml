@@ -6,34 +6,34 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Publish wheels for (binary) packages on PyPI"
+name: Publish wheels for (binary) packages on PyPI.
 description: ""
 inputs:
   root_user:
-    description: 'Repository name that should be publishing packages to PyPi.'
+    description: Repository name that should be publishing packages to PyPi.
     required: true
     default: SymbiFlow
   root_branch:
-    description: 'Default branch to publish packages from.'
+    description: Default branch to publish packages from.
     required: true
     default: refs/heads/master
   python-version:
-    description: 'Python version to publish for.'
+    description: Python version to publish for.
     required: true
   build-requirements:
-    description: 'Python (pip) packages required at build time, space-separated'
+    description: Python (pip) packages required at build time, space-separated.
     default:
   system-packages:
-    description: 'System (yum) packages required at build time, space-separated'
+    description: System (yum) packages required at build time, space-separated.
     default:
   pre-build-command:
-    description: 'Command to run before build, e.g. the execution of a script to perform additional build-environment setup'
+    description: Command to run before build, e.g. the execution of a script to perform additional build-environment setup.
     default:
   package-path:
-    description: 'Path to python package to build (e.g. where setup.py file is located), relative to repository root'
+    description: Path to python package to build (e.g. where setup.py file is located), relative to repository root.
     default: ''
   pip-wheel-args:
-    description: 'Extra extra arguments to pass to the pip wheel command (see pip documentation), passed paths are relative to package-path'
+    description: Extra extra arguments to pass to the pip wheel command (see pip documentation), passed paths are relative to package-path.
     default: -w ./dist --no-deps --verbose
 
 

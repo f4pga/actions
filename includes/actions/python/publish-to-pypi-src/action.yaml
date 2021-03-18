@@ -6,14 +6,14 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Publish source packages onto PyPI"
+name: Publish source packages onto PyPI
 description: ""
 inputs:
   root_user:
-    description: 'Repository name that should be publishing packages to PyPi.'
+    description: Repository name that should be publishing packages to PyPi.
     required: true
   root_branch:
-    description: 'Default branch to publish packages from.'
+    description: Default branch to publish packages from.
     required: true
     default: refs/heads/master
 
