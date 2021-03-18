@@ -6,20 +6,20 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Check and then upload packages (and potentially publish to PyPI)"
-description: "Check the (already built) and upload packages as artifacts (and potentially publish onto Test and real PyPI servers)."
+name: Check and then upload packages (and potentially publish to PyPI)
+description: Check the (already built) and upload packages as artifacts (and potentially publish onto Test and real PyPI servers).
 inputs:
   type:
-    description: 'Type of packages.'
+    description: Type of packages.
     required: true
   publish:
-    description: 'Publish packages to PyPI.'
+    description: Publish packages to PyPI.
     default: false
   root_user:
-    description: "Publish to PyPI from given user's repository."
+    description: Publish to PyPI from given user's repository.
     default:
   root_branch:
-    description: 'Publish to PyPI on provided branch.'
+    description: Publish to PyPI on provided branch.
     default: refs/heads/master
 
 runs:

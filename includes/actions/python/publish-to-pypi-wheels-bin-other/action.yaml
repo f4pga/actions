@@ -6,19 +6,19 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Publish wheels for (binary) packages on PyPI (for Windows & MacOS)."
+name: Publish wheels for (binary) packages on PyPI (for Windows & MacOS).
 description: ""
 inputs:
   root_user:
-    description: 'Repository name that should be publishing packages to PyPi.'
+    description: Repository name that should be publishing packages to PyPi.
     required: true
     default: SymbiFlow
   root_branch:
-    description: 'Default branch to publish packages from.'
+    description: Default branch to publish packages from.
     required: true
     default: refs/heads/master
   python-version:
-    description: 'Python version to publish for.'
+    description: Python version to publish for.
     required: true
 
 

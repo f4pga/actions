@@ -6,18 +6,18 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Build (pure python) packages and publish on PyPI"
+name: Build (pure python) packages and publish on PyPI
 description: ""
 inputs:
   root_user:
-    description: 'Repository name that should be publishing packages to PyPI.'
+    description: Repository name that should be publishing packages to PyPI.
     required: true
   root_branch:
-    description: 'Default branch to publish packages from.'
+    description: Default branch to publish packages from.
     required: true
     default: refs/heads/master
   python-versions:
-    description: 'Python version to publish for.'
+    description: Python version to publish for.
     required: true
     default: [ '2.x', '3.x' ]
   checkout-action:
@@ -45,7 +45,7 @@ jobs:
         python-version: [ '2.x', '3.x' ]
       fail-fast: false
 
-    name: '${{ matrix.python-version }}'
+    name: ${{ matrix.python-version }}
     runs-on: ubuntu-20.04
 
     steps:

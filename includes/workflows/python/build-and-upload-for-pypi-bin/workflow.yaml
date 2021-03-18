@@ -6,30 +6,30 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Build (binary) packages and publish on PyPI"
+name: Build (binary) packages and publish on PyPI
 description: ""
 inputs:
   root_user:
-    description: 'Repository name that should be publishing packages to PyPI.'
+    description: Repository name that should be publishing packages to PyPI.
     required: true
   root_branch:
-    description: 'Default branch to publish packages from.'
+    description: Default branch to publish packages from.
     required: true
     default: refs/heads/master
   python-versions:
-    description: 'Python version to publish for.'
+    description: Python version to publish for.
     required: true
     default: [ '3.6', '3.7', '3.8', '3.9' ]
   supports-linux:
-    description: 'Supported Linux operating systems.'
+    description: Supported Linux operating systems.
     required: true
     default: true
   supports-windows:
-    description: 'Supported Windows operating systems.'
+    description: Supported Windows operating systems.
     required: true
     default: true
   supports-macos:
-    description: 'Supported MacOS X operating systems.'
+    description: Supported MacOS X operating systems.
     required: true
     default: true
   checkout-action:

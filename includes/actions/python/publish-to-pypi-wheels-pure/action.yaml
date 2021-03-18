@@ -6,18 +6,18 @@
 #
 # SPDX-License-Identifier: ISC
 
-name: "Publish wheels for (pure) packages on PyPI"
+name: Publish wheels for (pure) packages on PyPI
 description: ""
 inputs:
   root_user:
-    description: 'Repository name that should be publishing packages to PyPI.'
+    description: Repository name that should be publishing packages to PyPI.
     required: true
   root_branch:
-    description: 'Default branch to publish packages from.'
+    description: Default branch to publish packages from.
     required: true
     default: refs/heads/master
   python-version:
-    description: 'Python version to publish for.'
+    description: Python version to publish for.
     required: true
 
 
