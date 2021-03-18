@@ -102,7 +102,7 @@ runs:
     run: |
       twine upload --skip-existing --verbose --repository testpypi dist/*
 
-  - name: 📤 Publish $${{ inputs.type }} to PyPI
+  - name: 📤 Publish ${{ inputs.type }} to PyPI
     if: |
         inputs.publish &&
         (github.ref == inputs.root_branch) &&
