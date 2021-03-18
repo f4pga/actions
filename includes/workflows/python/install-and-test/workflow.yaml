@@ -76,7 +76,7 @@ jobs:
         - pip install --verbose -e .    # Editable install
       fail-fast: false
 
-    name: Checkout with '${{ matrix.cmd }}' (${{ matrix.os }})
+    name: checkout with `${{ matrix.cmd }}` (on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -102,7 +102,7 @@ jobs:
         os: ${{ inputs.os }}
       fail-fast: false
 
-    name: clone and `make test`
+    name: clone and `make test` (on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -120,19 +120,15 @@ jobs:
   # Install from a sdist package
   # ----------------------------------------------------------------------
   BuildSdist:
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
+    name: (building sdist)
+    runs-on: ubuntu-20.04
 
     steps:
     - ${{ inputs.checkout-action }}
 
     - << : ${{ inputs.system-setup-action }}
       with:
-        os: ${{ matrix.os }}
+        os: ubuntu-20.04
         packaging-tools: true
 
     - name: 🚧 Build source 📦
@@ -150,6 +146,7 @@ jobs:
         os: ${{ inputs.os }}
       fail-fast: false
 
+    name: from sdist (on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: BuildSdist
 
@@ -181,6 +178,7 @@ jobs:
         os: ${{ inputs.os }}
       fail-fast: false
 
+    name: (building wheel on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -206,6 +204,7 @@ jobs:
         os: ${{ inputs.os }}
       fail-fast: false
 
+    name: from wheel (on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: BuildWheel
 
