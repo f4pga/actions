@@ -106,7 +106,7 @@ runs:
     if: |
         inputs.publish &&
         (github.ref == inputs.root_branch) &&
-        startsWith(inputs.root_user, github.repository) &&
+        startsWith(github.repository, inputs.root_user) &&
         (github.event_name != 'pull_request') &&
         (env.TWINE_PASSWORD != null)
     env:
