@@ -1,0 +1,120 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Publish wheels for (binary) packages on PyPI"
+description: ""
+inputs:
+  root_user:
+    description: 'Repository name that should be publishing packages to PyPi.'
+    required: true
+    default: SymbiFlow
+  root_branch:
+    description: 'Default branch to publish packages from.'
+    required: true
+    default: refs/heads/master
+  python-version:
+    description: 'Python version to publish for.'
+    required: true
+  build-requirements:
+    description: 'Python (pip) packages required at build time, space-separated'
+    default:
+  system-packages:
+    description: 'System (yum) packages required at build time, space-separated'
+    default:
+  pre-build-command:
+    description: 'Command to run before build, e.g. the execution of a script to perform additional build-environment setup'
+    default:
+  package-path:
+    description: 'Path to python package to build (e.g. where setup.py file is located), relative to repository root'
+    default: ''
+  pip-wheel-args:
+    description: 'Extra extra arguments to pass to the pip wheel command (see pip documentation), passed paths are relative to package-path'
+    default: -w ./dist --no-deps --verbose
+
+
+runs:
+  using: "includes"
+
+  steps:
+
+  # Linux -- manylinux
+  # ----------------------------------------------------------------------
+  - name: Config Check
+    if: ${{ !startswith(runner.os, 'Linux') }}
+    run: |
+      echo "Use"
+      echo
+      echo "  SymbiFlow/actions/includes/actions/python/publish-to-pypi-sheels-bin-other"
+      echo
+      echo "for Windows / Mac"
+      echo
+      exit 1
+
+  - name: Install packaging tooling on runner
+    run: |
+      echo "$HOME/.local/bin" >> $GITHUB_PATH
+      export PATH=$HOME/.local/bin:$PATH
+      pip install -U pip twine wheel auditwheel
+
+  - name: Check packaging tooling on runner
+    run: |
+      echo $PATH
+      which pip
+      which twine
+      which wheel
+      which auditwheel
+
+  - name: Workout manylinux-version
+    id: manylinux
+    shell: python
+    env:
+      PYTHON_VERSION: ${{ inputs.python-version }}
+    run: |
+      import os
+      MANYLINUX = {
+          "3.6": "cp36-cp36m",
+          "3.7": "cp37-cp37m",
+          "3.8": "cp38-cp38",
+          "3.9": "cp39-cp39",
+      }[os.environ['PYTHON_VERSION']]
+      print("::set-output name=version::"+MANYLINUX)
+
+  - name: 🚧 Build distribution 📦
+    uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2010_x86_64
+    with:
+      build-requirements: ${{ inputs.build-requirements }}
+      system-packages: ${{ inputs.system-packages }}
+      python-versions: ${{ steps.manylinux.outputs.version }}
+      pre-build-command: ${{ inputs.pre-build-command }}
+      package-path: ${{ inputs.package-path }}
+      pip-wheel-args: ${{ inputs.pip-wheel-args }}
+
+  - name: List distribution 📦
+    run: |
+      # Fix permissions
+      echo "::group::Fixing permission"
+      ls -l dist/*
+      echo $USER
+      whoami
+      sudo chown -R $USER dist
+      ls -l dist/*
+      echo "::endgroup::"
+      # Remove the non-manylinux versions
+      rm -v dist/*linux_x86_64*.whl
+      ls -l dist/*
+  # ----------------------------------------------------------------------
+
+  # Upload the packages
+  # ----------------------------------------------------------------------
+  - includes: ./includes/actions/python/check-upload-publish-packages
+    with:
+      type: wheels
+      publish: true
+      root_user: ${{ inputs.root_user }}
+      root_branch: ${{ inputs.root_branch }}
+  # ----------------------------------------------------------------------

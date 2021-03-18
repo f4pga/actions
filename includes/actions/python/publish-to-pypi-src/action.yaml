@@ -1,0 +1,39 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Publish source packages onto PyPI"
+description: ""
+inputs:
+  root_user:
+    description: 'Repository name that should be publishing packages to PyPi.'
+    required: true
+  root_branch:
+    description: 'Default branch to publish packages from.'
+    required: true
+    default: refs/heads/master
+
+
+runs:
+  using: "includes"
+
+  steps:
+  - includes: ./includes/actions/python/system-setup
+    with:
+      packaging-tools: true
+      development-tools: true
+
+  - name: 🚧 Build distribution 📦
+    run: |
+      python -m build --sdist --no-isolation .
+
+  - includes: ./includes/actions/python/check-upload-publish-packages
+    with:
+      type: source
+      publish: true
+      root_user: ${{ inputs.root_user }}
+      root_branch: ${{ inputs.root_branch }}

@@ -1,0 +1,42 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Publish wheels for (pure) packages on PyPI"
+description: ""
+inputs:
+  root_user:
+    description: 'Repository name that should be publishing packages to PyPI.'
+    required: true
+  root_branch:
+    description: 'Default branch to publish packages from.'
+    required: true
+    default: refs/heads/master
+  python-version:
+    description: 'Python version to publish for.'
+    required: true
+
+
+runs:
+  using: "includes"
+
+  steps:
+  - includes: ./includes/actions/python/system-setup
+    with:
+      python-version: ${{ inputs.python-version }}
+      packaging-tools: true
+
+  - name: 🚧 Build distribution 📦
+    run: |
+      python -m build --wheel .
+
+  - includes: ./includes/actions/python/check-upload-publish-packages
+    with:
+      type: wheels
+      publish: true
+      root_user: ${{ inputs.root_user }}
+      root_branch: ${{ inputs.root_branch }}

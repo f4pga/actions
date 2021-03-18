@@ -1,0 +1,230 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: Test after installing from...
+description: "Install in multiple ways (direct from GitHub, via pip, setup.py, packages) and then run the test suite."
+inputs:
+  module:
+    description: 'Name of Python module.'
+    required: true
+  os:
+    description: 'Operating systems to test on.'
+    required: true
+    default:
+    - windows-latest
+    - macos-latest
+    - ubuntu-20.04
+  checkout-action:
+    required: true
+    default:
+      uses: actions/checkout@v2
+  system-setup-action:
+    description: 'Local action to use to setup things.'
+    required: true
+    default:
+      includes: ./includes/actions/python/system-setup
+  test-action:
+    description: 'Local action to use to run the tests.'
+    required: true
+    default:
+      includes: /download-and-run-tests
+  supports-make-test:
+    description: 'Supports using `make test` to automatically setup the system and run the tests.'
+    required: true
+    default: true
+
+
+jobs:
+
+  # Install directly using pip from GitHub
+  # ----------------------------------------------------------------------
+  GitHub:
+    strategy:
+      matrix:
+        os: ${{ inputs.os }}
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - << : ${{ inputs.system-setup-action }}
+      with:
+        os: ${{ matrix.os }}
+
+    - name: Installing directly from GitHub
+      shell: bash
+      run: |
+        pip install --verbose git+https://github.com/${GITHUB_REPOSITORY}.git@${GITHUB_SHA}#egg=${{ inputs.module }}
+
+    - ${{ inputs.test-action }}
+  # ----------------------------------------------------------------------
+
+  # Install using a local checkout
+  # ----------------------------------------------------------------------
+  Checkout:
+    strategy:
+      matrix:
+        os: ${{ inputs.os }}
+        cmd:
+        - python setup.py install
+        - pip install --verbose .
+        - pip install --verbose -e .    # Editable install
+      fail-fast: false
+
+    name: Checkout with '${{ matrix.cmd }}' (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
+      with:
+        os: ${{ matrix.os }}
+
+    - name: Installing using '${{ matrix.cmd }}'
+      run: |
+        ${{ matrix.cmd }}
+
+    - ${{ inputs.test-action }}
+  # ----------------------------------------------------------------------
+
+  # Install into self-contained `make-env` environment.
+  # ----------------------------------------------------------------------
+  make:
+    if: ${{ inputs.supports-make-test }}
+    strategy:
+      matrix:
+        os: ${{ inputs.os }}
+      fail-fast: false
+
+    name: clone and `make test`
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
+      with:
+        os: ${{ matrix.os }}
+
+    - name: Run tests
+      run: |
+        make test
+  # ----------------------------------------------------------------------
+
+  # Install from a sdist package
+  # ----------------------------------------------------------------------
+  BuildSdist:
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
+      with:
+        os: ${{ matrix.os }}
+        packaging-tools: true
+
+    - name: 🚧 Build source 📦
+      run: |
+        python -m build --sdist
+
+    - includes: ./includes/actions/python/check-upload-publish-packages
+      with:
+        type: source
+        publish: false
+
+  sdist:
+    strategy:
+      matrix:
+        os: ${{ inputs.os }}
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+    needs: BuildSdist
+
+    steps:
+    - << : ${{ inputs.system-setup-action }}
+      with:
+        os: ${{ matrix.os }}
+
+    - name: 📥 Download source 📦
+      uses: actions/download-artifact@v2
+      with:
+        name: source
+        path: dist
+
+    - name: Installing using the source 📦
+      shell: bash
+      run: |
+        ls -l dist/*
+        pip install --verbose dist/*
+
+    - ${{ inputs.test-action }}
+  # ----------------------------------------------------------------------
+
+  # Install from a binary wheel package
+  # ----------------------------------------------------------------------
+  BuildWheel:
+    strategy:
+      matrix:
+        os: ${{ inputs.os }}
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - << : ${{ inputs.system-setup-action }}
+      with:
+        os: ${{ matrix.os }}
+        packaging-tools: true
+
+    - name: 🚧 Build wheel 📦
+      run: |
+        python -m build --wheel
+
+    - includes: ./includes/actions/python/check-upload-publish-packages
+      with:
+        type: wheels
+        publish: false
+
+  Wheel:
+    strategy:
+      matrix:
+        os: ${{ inputs.os }}
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+    needs: BuildWheel
+
+    steps:
+    - << : ${{ inputs.system-setup-action }}
+      with:
+        os: ${{ matrix.os }}
+
+    - name: 📥 Download wheel 📦
+      uses: actions/download-artifact@v2
+      with:
+        name: wheels-${{ runner.os }}
+        path: dist
+
+    - name: Installing using the wheel 📦
+      shell: bash
+      run: |
+        ls -l dist/*
+        pip install --verbose dist/*.whl
+
+    - ${{ inputs.test-action }}
+  # ----------------------------------------------------------------------

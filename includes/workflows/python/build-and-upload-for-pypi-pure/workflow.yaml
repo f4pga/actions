@@ -1,0 +1,58 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: "Build (pure python) packages and publish on PyPI"
+description: ""
+inputs:
+  root_user:
+    description: 'Repository name that should be publishing packages to PyPI.'
+    required: true
+  root_branch:
+    description: 'Default branch to publish packages from.'
+    required: true
+    default: refs/heads/master
+  python-versions:
+    description: 'Python version to publish for.'
+    required: true
+    default: [ '2.x', '3.x' ]
+  checkout-action:
+    required: true
+    default:
+      uses: actions/checkout@v2
+
+jobs:
+
+  Source:
+    name: Source
+    runs-on: ubuntu-20.04
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - includes: ./includes/actions/python/publish-to-pypi-src
+      with:
+        root_user: ${{ inputs.root_user }}
+        root_branch: ${{ inputs.root_branch }}
+
+  Wheels:
+    strategy:
+      matrix:
+        python-version: [ '2.x', '3.x' ]
+      fail-fast: false
+
+    name: '${{ matrix.python-version }}'
+    runs-on: ubuntu-20.04
+
+    steps:
+    - ${{ inputs.checkout-action }}
+
+    - includes: ./includes/actions/python/publish-to-pypi-wheels-pure
+      with:
+        python-version: ${{ matrix.python-version }}
+        root_user: ${{ inputs.root_user }}
+        root_branch: ${{ inputs.root_branch }}
