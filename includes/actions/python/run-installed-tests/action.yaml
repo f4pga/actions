@@ -1,0 +1,24 @@
+# Copyright (C) 2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: 🧰 Test
+description: >
+  Run tests installed as part of the package with `pytest`. The action will get
+  the `requirements.txt` file from GitHub and install the requirements for
+  running the tests. It will also download the `pytest.ini` file to make sure
+  the correct pytest configuration is used.
+
+runs:
+  using: "includes"
+
+  steps:
+  - name: Install tests requirements
+    includes-script: get-reqs-txt-and-install-tests-deps.py
+
+  - name: Run Test
+    includes-script: get-pytest-ini-and-run-tests.py

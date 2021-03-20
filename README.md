@@ -56,4 +56,7 @@ to expand it into `.github/workflow/XXXX.yml`.
    Action which uploads already built packages (from the other
    `python-to-pypi-XXXX` actions).
 
-
+ * [`includes/actions/python/run-installed-tests`](./includes/actions/python/run-installed-tests/action.yaml) -
+   Action which runs tests which have been installed as part of a Python
+   package (downloads `requirements.txt` and `pytest.ini` from source
+   repository).
