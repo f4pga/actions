@@ -13,6 +13,11 @@ description: >
   running the tests. It will also download the `pytest.ini` file to make sure
   the correct pytest configuration is used.
 
+inputs:
+  module:
+    description: Name of Python module to be tested.
+    required: true
+
 runs:
   using: "includes"
 
@@ -22,3 +27,5 @@ runs:
 
   - name: Run Test
     includes-script: get-pytest-ini-and-run-tests.py
+    env:
+      PYTHON_MODULE: ${{ inputs.module }}

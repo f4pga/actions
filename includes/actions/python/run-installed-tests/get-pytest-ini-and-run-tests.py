@@ -14,10 +14,13 @@ from __future__ import print_function
 import pprint
 import urllib
 import urllib.request
+import os
 import os.path
 import sys
 
 from pkg_resources import get_distribution
+
+module_name = os.environ['PYTHON_MODULE']
 
 # Download pytest.ini
 if not os.path.exists('pytest.ini'):
@@ -37,11 +40,11 @@ if not os.path.exists('pytest.ini'):
         f.write(data)
 
 # Print info about installed module
-module = get_distribution('rr-graph')
+module = get_distribution(module_name)
 version = '.'.join(module.version.split('.'))
 print()
-print('rr_graph version:', version)
-print('rr_graph location:', module.location)
+print(module_name, 'version:', version)
+print(module_name, 'location:', module.location)
 print()
 
 sys.stdout.flush()
