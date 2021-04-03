@@ -23,6 +23,9 @@ inputs:
     required: true
     default:
       uses: actions/checkout@v2
+      with:
+        # Always clone the full depth so git-describe works.
+        fetch-depth: 0
   system-setup-action:
     description: Local action to use to setup things.
     required: true
