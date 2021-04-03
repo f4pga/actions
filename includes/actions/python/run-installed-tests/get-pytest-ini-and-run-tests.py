@@ -49,6 +49,6 @@ print()
 
 sys.stdout.flush()
 sys.stderr.flush()
-# Run pytest against the rr_graph library
+# Run pytest against the library
 import pytest
-pytest.main()
+sys.exit(pytest.main())
