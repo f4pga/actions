@@ -16,8 +16,14 @@ import pathlib
 import pprint
 import re
 import sys
+import tempfile
 
-import logging
+
+__path__ = pathlib.Path(__file__).resolve().parent
+
+
+ON_GITHUB_ACTIONS = (
+    os.environ.get('GITHUB_ACTIONS', 'false').lower() in ('1', 'true'))
 
 
 def relpath(fpath):
@@ -97,7 +103,8 @@ def report_file_error(error_message, filename, lineno=0, wanted=None, found=None
         filename = pathlib.Path(os.path.relpath(filename))
 
     fwarn(filename, 'Error on line %s: %s', lineno, full_error)
-    print('::error file={},line={},col=0::{}'.format(filename, lineno, full_error))
+    if ON_GITHUB_ACTIONS:
+        print(':error file={},line={},col=0:{}'.format(filename, lineno, full_error))
     return [full_error]
 
 
@@ -349,12 +356,28 @@ def exclude_match(path, exclude_type):
     return None
 
 
-def main(args):
-    if os.environ.get('INPUT_DEBUG', 'false').lower() in ('true', '1'):
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
+class OutputGroup:
+    def __init__(self, title):
+        self.title = title
 
+    def __enter__(self):
+        print()
+        if ON_GITHUB_ACTIONS:
+            print('::group::'+self.title)
+        else:
+            print(self.title)
+        print('-'*75)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print('-'*75)
+        if ON_GITHUB_ACTIONS:
+            print('::endgroup::')
+        print()
+
+
+
+
+def main(args):
     root_dir = pathlib.Path().resolve()
     logging.debug('Starting search in: %s', root_dir)
 
@@ -420,21 +443,80 @@ def main(args):
                 errors[fpath] = ferrors
 
     if errors:
-        print()
-        print('::group::Error summary')
-        print('-'*75)
-        for fpath in sorted(errors):
-            frelpath = fpath.relative_to(root_dir)
-            print()
-            print(frelpath)
-            for e in sorted(errors[fpath]):
-                print(' *', e)
-            print()
-        print('-'*75)
-        print('::endgroup::')
+        with OutputGroup('Error summary'):
+            for fpath in sorted(errors):
+                frelpath = fpath.relative_to(root_dir)
+                print()
+                print(frelpath)
+                for e in sorted(errors[fpath]):
+                    print(' *', e)
+                print()
 
     return len(errors)
 
 
+# Extra functionality targeted at github actions
+
+MATCHER_OWNER = 'symbiflow-checks'
+
+
+def matcher_add():
+    """
+    See https://github.com/actions/toolkit/blob/main/docs/commands.md#problem-matchers
+
+    The matcher json must be available in the **current** workspace.
+    See https://github.community/t/problem-matcher-not-found-in-docker-action/16814/2
+
+    Hence we read the matcher data from the docker container and then write it
+    out into the workspace before outputting the `::add-matcher` command.
+    """
+
+    # Read in the problem_matcher.json data
+    infile = __path__ / 'problem_matcher.json'
+    with open(infile) as f:
+        data = f.read()
+
+    assert MATCHER_OWNER in data, (MATCHER_OWNER, data)
+
+    # Write out the problem_matcher.json data to a file in the local directory.
+    fname = 'symbiflow_checks.json'
+    inside_docker = pathlib.Path('/github/workflow')
+    if inside_docker.exists():
+        logging.debug('Running inside GitHub Action docker container!')
+        outside_docker = pathlib.Path(os.environ['RUNNER_TEMP']) / '_github_workflow'
+    else:
+        logging.debug('Running outside docker container!')
+        inside_docker = pathlib.Path(tempfile.gettempdir())
+        outside_docker = inside_docker
+
+    logging.debug('Matcher will be written to: %s', inside_docker)
+    logging.debug('Matcher will be found at: %s', outside_docker)
+
+    with open(inside_docker / fname, 'w') as f:
+        f.write(data)
+
+    print('::add-matcher::{}'.format(outside_docker / fname))
+
+
+def matcher_remove():
+    print('::remove-matcher owner={},::'.format(MATCHER_OWNER))
+
+
+def github_actions_main(args):
+    matcher_add()
+    try:
+        return main(args)
+    finally:
+        matcher_remove()
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    if os.environ.get('INPUT_DEBUG', 'false').lower() in ('true', '1'):
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    if ON_GITHUB_ACTIONS:
+        sys.exit(github_actions_main(sys.argv))
+    else:
+        sys.exit(main(sys.argv))

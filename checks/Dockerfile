@@ -12,6 +12,6 @@ RUN apt-get update -qq \
 # Print python version
 RUN /usr/bin/env python3 --version
 
-COPY *.py /checks/
+COPY * /checks/
 
 ENTRYPOINT ["/checks/checks.py"]
