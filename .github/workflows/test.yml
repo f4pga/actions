@@ -74,6 +74,7 @@ jobs:
       with:
         debug: true
         directoryExclude: >
+          .git
           tests
 
     - name: Running `checks` with directoryExclude
@@ -81,6 +82,7 @@ jobs:
       with:
         debug: true
         directoryExclude: >
+          .git
           */tests/*
 
     - name: Running `checks` with directoryExclude
@@ -88,6 +90,7 @@ jobs:
       with:
         debug: true
         directoryExclude: >
+          .git
           */tests
 
     # Test the `pythonExclude` input argument to the action
@@ -112,6 +115,7 @@ jobs:
     - name: Running `checks` with pythonExclude
       uses: ./checks
       with:
+        debug: true
         pythonExclude: >
           */python/*
 

@@ -7,27 +7,32 @@ inputs:
     description: Output extra debug information
     default: false
 
-  licenseExclude:
-    description: 'List of dir/file patterns to exclude from the license check'
+  thirdPartyExclude:
+    description: 'List of directory patterns to consider third_party resources.'
     default: >
-      */.*/*
-      */build/*
-      */env/*
-      */src/*
-      */third_party/*
+      third_party
+
+  directoryExclude:
+    description: 'List of dir/file patterns to exclude from all checks'
+    default: >
+      .git
+      *env
+      build
+      *cache*
+
+  licenseExclude:
+    description: 'List of dir/file patterns to exclude from the license checks'
+    default: >
       */*/__init__.py
       ./miniconda.sh
 
   pythonExclude:
-    description: 'List of dir/file patterns to exclude from the Python linting check'
+    description: 'List of dir/file patterns to exclude from the Python checks'
     default: >
-      */.*/*
-      */build/*
-      */env/*
-      */src/*
-      */third_party/*
-      */*/__init__.py
-      ./miniconda.sh
+      */.*
+      */__pycache__/*
+      */.pytest_*/*
+
 
 runs:
   using: 'docker'
