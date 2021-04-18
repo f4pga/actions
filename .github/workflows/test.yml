@@ -15,8 +15,24 @@ jobs:
       with:
         submodules: recursive
 
-    - name: List files found
-      run: find | sort
+    - name: Useful info
+      run: |
+        echo
+        echo "::group::Files"
+        find | sort
+        echo "::endgroup::"
+        echo
+        echo
+        echo "::group::Environment"
+        export
+        echo "::endgroup::"
+        echo
+
+    - name: Running `check` with debug output.
+      uses: ./checks
+      continue-on-error: true
+      with:
+        debug: true
 
     - id: fail-with-tests
       name: Running `checks` action against own repository.

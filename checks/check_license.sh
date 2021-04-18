@@ -17,13 +17,31 @@ echo "==========================="
 echo
 
 ERROR_FILES=""
-FILES_TO_CHECK=$(find . \
-    -type f \( -name '*.sh' -o -name '*.py' -o -name 'Makefile' -o -name '*.v' \) \
-    `for item in $INPUT_LICENSEEXCLUDE; do echo "( -not -path \"$item\" )"; done` | sort)
+FIND_CMD_FILE=$(mktemp) || exit
+trap "rm -f -- '$FIND_CMD_FILE'" EXIT
 
-for file in $FILES_TO_CHECK; do
-    echo "Checking $file"
-    grep -q "SPDX-License-Identifier" $file || ERROR_FILES="$ERROR_FILES $file"
+cat > $FIND_CMD_FILE <<EOF
+find .
+ -type f
+ \( -name '*.sh' -o -name '*.py' -o -name 'Makefile' -o -name '*.v' \)
+EOF
+for EXCLUDE in $INPUT_LICENSEEXCLUDE; do
+    echo " \( -not path '$EXCLUDE' \)" >> $FIND_CMD_FILE
+done
+
+if [ "$INPUT_DEBUG" = "true" ]; then
+    echo "::group::Find command"
+    echo "-------------------------------------------------"
+    cat $FIND_CMD_FILE
+    echo "-------------------------------------------------"
+    echo "::endgroup::"
+    echo
+fi
+
+
+eval $(cat $FIND_CMD_FILE) | sort | while IFS= read -r file; do
+    echo "Checking '$file'"
+    grep -q "SPDX-License-Identifier" "$file" || ERROR_FILES="$ERROR_FILES '$file'"
 done
 
 if [ ! -z "$ERROR_FILES" ]; then

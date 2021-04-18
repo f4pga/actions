@@ -3,6 +3,10 @@ description: "Run license and linting checks"
 
 inputs:
 
+  debug:
+    description: Output extra debug information
+    default: false
+
   licenseExclude:
     description: 'List of dir/file patterns to exclude from the license check'
     default: >
