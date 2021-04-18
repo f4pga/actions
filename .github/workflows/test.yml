@@ -10,8 +10,131 @@ jobs:
   Checks:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Getting code
+      uses: actions/checkout@v2
       with:
         submodules: recursive
 
-    - uses: ./checks
+    - name: List files found
+      run: find | sort
+
+    - id: fail-with-tests
+      name: Running `checks` action against own repository.
+      uses: ./checks
+      continue-on-error: true
+
+    - name: Error on success
+      if: steps.fail-with-tests.outcome != 'failure'
+      run:
+        echo "The checks action should fail while the checks/tests directory exists!"
+        exit 1
+
+    - name: Removing files which are designed to fail the checks
+      run: |
+        rm -rf ./checks/tests
+
+    - name: Running `checks` action against own repository.
+      uses: ./checks
+
+    # Test the `directoryExclude` input argument to the action
+    # ------------------------------------------------------------------------
+    - name: Setting up directoryExclude test
+      run: |
+        git reset --hard
+
+    - id: fail-without-directoryExclude
+      name: Checking `checks` fails without directoryExclude
+      uses: ./checks
+      continue-on-error: true
+
+    - name: Error on success
+      if: steps.fail-without-directoryExclude.outcome != 'failure'
+      run: |
+        echo "The checks action should fail without using `directoryExclude`!"
+        exit 1
+
+    - name: Running `checks` with directoryExclude
+      uses: ./checks
+      with:
+        debug: true
+        directoryExclude: >
+          tests
+
+    - name: Running `checks` with directoryExclude
+      uses: ./checks
+      with:
+        debug: true
+        directoryExclude: >
+          */tests/*
+
+    - name: Running `checks` with directoryExclude
+      uses: ./checks
+      with:
+        debug: true
+        directoryExclude: >
+          */tests
+
+    # Test the `pythonExclude` input argument to the action
+    # ------------------------------------------------------------------------
+    - name: Setting up pythonExclude test
+      run: |
+        git reset --hard
+        rm -rf ./checks/tests
+        git checkout ./checks/tests/python
+
+    - id: fail-without-pythonExclude
+      name: Checking `checks` fails without pythonExclude
+      uses: ./checks
+      continue-on-error: true
+
+    - name: Error on success
+      if: steps.fail-without-pythonExclude.outcome != 'failure'
+      run: |
+        echo "The checks action should fail without using `pythonExclude`!"
+        exit 1
+
+    - name: Running `checks` with pythonExclude
+      uses: ./checks
+      with:
+        pythonExclude: >
+          */python/*
+
+    - name: Running `checks` with pythonExclude
+      uses: ./checks
+      with:
+        debug: true
+        pythonExclude: >
+          */python
+
+    # Test the `licenseExclude` input argument to the action
+    # ------------------------------------------------------------------------
+    - name: Setting up licenseExclude test
+      run: |
+        git reset --hard
+        rm -rf ./checks/tests
+        git checkout ./checks/tests/license
+
+    - id: fail-without-licenseExclude
+      name: Checking `checks` fails without licenseExclude
+      uses: ./checks
+      continue-on-error: true
+
+    - name: Error on success
+      if: steps.fail-without-licenseExclude.outcome != 'failure'
+      run: |
+        echo "The checks action should fail without using `licenseExclude`!"
+        exit 1
+
+    - name: Running `checks` with licenseExclude
+      uses: ./checks
+      with:
+        debug: true
+        licenseExclude: >
+          */license/*
+
+    - name: Running `checks` with licenseExclude
+      uses: ./checks
+      with:
+        debug: true
+        licenseExclude: >
+          */license
