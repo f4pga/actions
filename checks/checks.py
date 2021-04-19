@@ -25,6 +25,9 @@ __path__ = pathlib.Path(__file__).resolve().parent
 ON_GITHUB_ACTIONS = (
     os.environ.get('GITHUB_ACTIONS', 'false').lower() in ('1', 'true'))
 
+OUTPUT_ANNOTATIONS = (
+    os.environ.get('INPUT_ANNOTATIONS', 'false').lower() in ('1', 'true'))
+
 
 def relpath(fpath):
     """Convert the path to be relative to the current working directory."""
@@ -47,7 +50,10 @@ def fwarn(fpath, msg, *args, **kw):
 
 def excludes(etype, dirs=False, _cache={}):
     if etype not in _cache:
-        env_name = 'INPUT_{}EXCLUDE'.format(etype.upper())
+        if etype == 'third_party':
+            env_name = 'INPUT_THIRD_PARTY'
+        else:
+            env_name = 'INPUT_EXCLUDE_{}'.format(etype.upper())
         raw_input_exclude = os.environ.get(env_name, '')
         logging.debug("%s = %r", env_name, raw_input_exclude)
 
@@ -470,6 +476,8 @@ def matcher_add():
     Hence we read the matcher data from the docker container and then write it
     out into the workspace before outputting the `::add-matcher` command.
     """
+    if not OUTPUT_ANNOTATIONS:
+        return
 
     # Read in the problem_matcher.json data
     infile = __path__ / 'problem_matcher.json'
@@ -499,6 +507,8 @@ def matcher_add():
 
 
 def matcher_remove():
+    if not OUTPUT_ANNOTATIONS:
+        return
     print('::remove-matcher owner={},::'.format(MATCHER_OWNER))
 
 

@@ -1,5 +1,5 @@
-name: 'Checks'
-description: "Run license and linting checks"
+name: Checks
+description: License and other basic checks
 
 inputs:
 
@@ -7,32 +7,35 @@ inputs:
     description: Output extra debug information
     default: false
 
-  thirdPartyExclude:
-    description: 'List of directory patterns to consider third_party resources.'
+  annotations:
+    description: Should the script output annotations?
+    default: true
+
+  third_party:
+    description: List of directory patterns to consider third_party resources.
     default: >
       third_party
 
-  directoryExclude:
-    description: 'List of dir/file patterns to exclude from all checks'
+  exclude_directory:
+    description: List of dir/file patterns to exclude from all checks
     default: >
       .git
       *env
       build
       *cache*
 
-  licenseExclude:
-    description: 'List of dir/file patterns to exclude from the license checks'
+  exclude_license:
+    description: List of dir/file patterns to exclude from the license checks
     default: >
       */*/__init__.py
       ./miniconda.sh
 
-  pythonExclude:
-    description: 'List of dir/file patterns to exclude from the Python checks'
+  exclude_python:
+    description: List of dir/file patterns to exclude from the Python checks
     default: >
       */.*
       */__pycache__/*
       */.pytest_*/*
-
 
 runs:
   using: 'docker'

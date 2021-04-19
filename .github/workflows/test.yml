@@ -33,6 +33,7 @@ jobs:
       continue-on-error: true
       with:
         debug: true
+        annotations: false
 
     - id: fail-with-tests
       name: Running `checks` action against own repository.
@@ -52,109 +53,125 @@ jobs:
     - name: Running `checks` action against own repository.
       uses: ./checks
 
-    # Test the `directoryExclude` input argument to the action
+    # Test the `exclude_directory` input argument to the action
     # ------------------------------------------------------------------------
-    - name: Setting up directoryExclude test
+    - name: Setting up exclude_directory test
       run: |
         git reset --hard
 
-    - id: fail-without-directoryExclude
-      name: Checking `checks` fails without directoryExclude
+    - id: fail-without-exclude_directory
+      name: Checking `checks` fails without exclude_directory
       uses: ./checks
       continue-on-error: true
+      with:
+        debug: true
+        annotations: false
 
     - name: Error on success
-      if: steps.fail-without-directoryExclude.outcome != 'failure'
+      if: steps.fail-without-exclude_directory.outcome != 'failure'
       run: |
-        echo "The checks action should fail without using `directoryExclude`!"
+        echo "The checks action should fail without using `exclude_directory`!"
         exit 1
 
-    - name: Running `checks` with directoryExclude
+    - name: Running `checks` with exclude_directory
       uses: ./checks
       with:
         debug: true
-        directoryExclude: >
+        annotations: false
+        exclude_directory: >
           .git
           tests
 
-    - name: Running `checks` with directoryExclude
+    - name: Running `checks` with exclude_directory
       uses: ./checks
       with:
         debug: true
-        directoryExclude: >
+        annotations: false
+        exclude_directory: >
           .git
           */tests/*
 
-    - name: Running `checks` with directoryExclude
+    - name: Running `checks` with exclude_directory
       uses: ./checks
       with:
         debug: true
-        directoryExclude: >
+        annotations: false
+        exclude_directory: >
           .git
           */tests
 
-    # Test the `pythonExclude` input argument to the action
+    # Test the `exclude_python` input argument to the action
     # ------------------------------------------------------------------------
-    - name: Setting up pythonExclude test
+    - name: Setting up exclude_python test
       run: |
         git reset --hard
         rm -rf ./checks/tests
         git checkout ./checks/tests/python
 
-    - id: fail-without-pythonExclude
-      name: Checking `checks` fails without pythonExclude
+    - id: fail-without-exclude_python
+      name: Checking `checks` fails without exclude_python
       uses: ./checks
       continue-on-error: true
+      with:
+        debug: true
+        annotations: false
 
     - name: Error on success
-      if: steps.fail-without-pythonExclude.outcome != 'failure'
+      if: steps.fail-without-exclude_python.outcome != 'failure'
       run: |
-        echo "The checks action should fail without using `pythonExclude`!"
+        echo "The checks action should fail without using `exclude_python`!"
         exit 1
 
-    - name: Running `checks` with pythonExclude
+    - name: Running `checks` with exclude_python
       uses: ./checks
       with:
         debug: true
-        pythonExclude: >
+        annotations: false
+        exclude_python: >
           */python/*
 
-    - name: Running `checks` with pythonExclude
+    - name: Running `checks` with exclude_python
       uses: ./checks
       with:
         debug: true
-        pythonExclude: >
+        annotations: false
+        exclude_python: >
           */python
 
-    # Test the `licenseExclude` input argument to the action
+    # Test the `exclude_license` input argument to the action
     # ------------------------------------------------------------------------
-    - name: Setting up licenseExclude test
+    - name: Setting up exclude_license test
       run: |
         git reset --hard
         rm -rf ./checks/tests
         git checkout ./checks/tests/license
 
-    - id: fail-without-licenseExclude
-      name: Checking `checks` fails without licenseExclude
+    - id: fail-without-exclude_license
+      name: Checking `checks` fails without exclude_license
       uses: ./checks
       continue-on-error: true
+      with:
+        debug: true
+        annotations: false
 
     - name: Error on success
-      if: steps.fail-without-licenseExclude.outcome != 'failure'
+      if: steps.fail-without-exclude_license.outcome != 'failure'
       run: |
-        echo "The checks action should fail without using `licenseExclude`!"
+        echo "The checks action should fail without using `exclude_license`!"
         exit 1
 
-    - name: Running `checks` with licenseExclude
+    - name: Running `checks` with exclude_license
       uses: ./checks
       with:
         debug: true
-        licenseExclude: >
+        annotations: false
+        exclude_license: >
           */license/*
 
-    - name: Running `checks` with licenseExclude
+    - name: Running `checks` with exclude_license
       uses: ./checks
       with:
         debug: true
-        licenseExclude: >
+        annotations: false
+        exclude_license: >
           */license
