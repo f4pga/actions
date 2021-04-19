@@ -338,8 +338,11 @@ def detect_file_type(pname):
     if pname.match('*.py'):
         return 'python'
 
-    if pname.match('Makefile'):
+    if pname.match('Makefile') or pname.match('*.mk'):
         return 'make'
+
+    if pname.match('*.yaml') or pname.match('*.yml'):
+        return 'yaml'
 
     if pname.match('*.sh'):
         return 'shell'

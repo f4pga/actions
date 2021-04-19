@@ -24,6 +24,15 @@ jobs:
 
 The following checks are performed.
 
+## Files
+
+The checks are currently performed on the following files;
+
+ - Python files - `*.py`
+ - Yaml files - `*.yaml` & `*.yml`
+ - make files - `Makefile` and `*.mk`
+ - Shell/Bash files - `*.sh`
+
 ## License Checks
 
 
