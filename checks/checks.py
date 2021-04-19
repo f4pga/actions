@@ -131,7 +131,6 @@ def python_check_shebang(filename, header_lines):
 
     Otherwise we shouldn't have an empty python file
     >>> python_check_shebang(P('a.py'), [])
-    ::error file=a.py,line=0::Incorrect shebang (#!) line - Wanted: '#!/usr/bin/env python3\n', Found: ''
     ["Incorrect shebang (#!) line - Wanted: '#!/usr/bin/env python3\\n', Found: ''"]
 
 
@@ -141,7 +140,6 @@ def python_check_shebang(filename, header_lines):
 
     Incorrect shebang line
     >>> python_check_shebang(P('a.py'), ['#!/usr/bin/env python\n'])
-    ::error file=a.py,line=0::Incorrect shebang (#!) line - Wanted: '#!/usr/bin/env python3\n', Found: '#!/usr/bin/env python\n'
     ["Incorrect shebang (#!) line - Wanted: '#!/usr/bin/env python3\\n', Found: '#!/usr/bin/env python\\n'"]
 
 
@@ -176,7 +174,6 @@ def python_check_coding(filename, header_lines):
 
     Otherwise we shouldn't have an empty python file
     >>> python_check_coding(P('a.py'), [])
-    ::error file=a.py,line=1::utf-8 coding not set - Wanted: '^#.*coding: utf-8.*$', Found: ''
     ["utf-8 coding not set - Wanted: '^#.*coding: utf-8.*$', Found: ''"]
 
     Correct coding line
@@ -185,7 +182,6 @@ def python_check_coding(filename, header_lines):
 
     Missing coding line
     >>> python_check_coding(P('a.py'), ['#!/usr/bin/env python\\n', 'print("hello")\\n'])
-    ::error file=a.py,line=1::utf-8 coding not set - Wanted: '^#.*coding: utf-8.*$', Found: 'print("hello")\\n'
     ['utf-8 coding not set - Wanted: \'^#.*coding: utf-8.*$\', Found: \'print("hello")\\\\n\'']
 
 
@@ -240,7 +236,6 @@ def license_check_spdx(filename, header_lines):
 
     No SPDX line
     >>> license_check_spdx(P('__init__.py'), ['a', 'b', 'c'])
-    ::error file=__init__.py,line=0::Missing SPDX-License-Identifier line in header
     ['Missing SPDX-License-Identifier line in header']
 
     Valid SPDX line
