@@ -98,7 +98,8 @@ def read_header(pname):
     return lines
 
 
-def report_file_error(error_message, filename, lineno=0, wanted=None, found=None):
+def report_file_error(error_message, filename, lineno=1, wanted=None, found=None):
+    assert lineno > 0, f'Line numbers start at 1, got {lineno}'
     if wanted is not None:
         assert found is not None, (wanted, found)
         full_error = '{} - Wanted: {!r}, Found: {!r}'.format(error_message, wanted, found)
@@ -156,7 +157,7 @@ def python_check_shebang(filename, header_lines):
     if header_lines[0] != shebang_line:
         return report_file_error(
             'Incorrect shebang (#!) line',
-            filename, 0,
+            filename, 1,
             shebang_line, header_lines[0],
         )
 
@@ -198,7 +199,7 @@ def python_check_coding(filename, header_lines):
     if not re.match(coding_line, header_lines[1]):
         return report_file_error(
             'utf-8 coding not set',
-            filename, 1,
+            filename, 2,
             coding_line, header_lines[1],
         )
 
