@@ -1,0 +1,211 @@
+# Copyright (C) 2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier:	ISC
+
+name: SymbiFLow/checks action
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  ChecksPythonTests:
+    name: doctests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Getting code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        cd checks
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        cd checks
+        pytest
+
+  ChecksActionsTests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Getting code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Useful info
+      run: |
+        echo
+        echo "::group::Files"
+        find | sort
+        echo "::endgroup::"
+        echo
+        echo
+        echo "::group::Environment"
+        export
+        echo "::endgroup::"
+        echo
+
+    - name: Running `check` with debug output.
+      uses: ./checks
+      continue-on-error: true
+      with:
+        debug: true
+        annotations: false
+
+    - id: fail-with-tests
+      name: Running `checks` action against own repository.
+      uses: ./checks
+      continue-on-error: true
+
+    - name: Error on success
+      if: steps.fail-with-tests.outcome != 'failure'
+      run:
+        echo "The checks action should fail while the checks/tests directory exists!"
+        exit 1
+
+    - name: Removing files which are designed to fail the checks
+      run: |
+        rm -rf ./checks/tests
+
+    - name: Running `checks` action against own repository.
+      uses: ./checks
+
+    # Test the `exclude_directory` input argument to the action
+    # ------------------------------------------------------------------------
+    - name: Setting up exclude_directory test
+      run: |
+        git reset --hard
+
+    - id: fail-without-exclude_directory
+      name: Checking `checks` fails without exclude_directory
+      uses: ./checks
+      continue-on-error: true
+      with:
+        debug: true
+        annotations: false
+
+    - name: Error on success
+      if: steps.fail-without-exclude_directory.outcome != 'failure'
+      run: |
+        echo "The checks action should fail without using `exclude_directory`!"
+        exit 1
+
+    - name: Running `checks` with exclude_directory
+      uses: ./checks
+      with:
+        debug: true
+        annotations: false
+        exclude_directory: >
+          .git
+          tests
+
+    - name: Running `checks` with exclude_directory
+      uses: ./checks
+      with:
+        debug: true
+        annotations: false
+        exclude_directory: >
+          .git
+          */tests/*
+
+    - name: Running `checks` with exclude_directory
+      uses: ./checks
+      with:
+        debug: true
+        annotations: false
+        exclude_directory: >
+          .git
+          */tests
+
+    # Test the `exclude_python` input argument to the action
+    # ------------------------------------------------------------------------
+    - name: Setting up exclude_python test
+      run: |
+        git reset --hard
+        rm -rf ./checks/tests
+        git checkout ./checks/tests/python
+
+    - id: fail-without-exclude_python
+      name: Checking `checks` fails without exclude_python
+      uses: ./checks
+      continue-on-error: true
+      with:
+        debug: true
+        annotations: false
+
+    - name: Error on success
+      if: steps.fail-without-exclude_python.outcome != 'failure'
+      run: |
+        echo "The checks action should fail without using `exclude_python`!"
+        exit 1
+
+    - name: Running `checks` with exclude_python
+      uses: ./checks
+      with:
+        debug: true
+        annotations: false
+        exclude_python: >
+          */python/*
+
+    - name: Running `checks` with exclude_python
+      uses: ./checks
+      with:
+        debug: true
+        annotations: false
+        exclude_python: >
+          */python
+
+    # Test the `exclude_license` input argument to the action
+    # ------------------------------------------------------------------------
+    - name: Setting up exclude_license test
+      run: |
+        git reset --hard
+        rm -rf ./checks/tests
+        git checkout ./checks/tests/license
+
+    - id: fail-without-exclude_license
+      name: Checking `checks` fails without exclude_license
+      uses: ./checks
+      continue-on-error: true
+      with:
+        debug: true
+        annotations: false
+
+    - name: Error on success
+      if: steps.fail-without-exclude_license.outcome != 'failure'
+      run: |
+        echo "The checks action should fail without using `exclude_license`!"
+        exit 1
+
+    - name: Running `checks` with exclude_license
+      uses: ./checks
+      with:
+        debug: true
+        annotations: false
+        exclude_license: >
+          */license/*
+
+    - name: Running `checks` with exclude_license
+      uses: ./checks
+      with:
+        debug: true
+        annotations: false
+        exclude_license: >
+          */license

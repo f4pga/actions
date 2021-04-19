@@ -9,5 +9,9 @@ RUN apt-get update -qq \
  && update-ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-COPY *.sh /checks/
-ENTRYPOINT ["/checks/checks.sh"]
+# Print python version
+RUN /usr/bin/env python3 --version
+
+COPY * /checks/
+
+ENTRYPOINT ["/checks/checks.py"]
