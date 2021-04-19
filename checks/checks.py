@@ -296,7 +296,7 @@ LICENSE_FILES = [
 ]
 
 
-def thirdparty_checks(pname):
+def third_party_checks(pname):
     """Check a directory containing third party contents.
 
     Checks performed:
@@ -395,10 +395,10 @@ def main(args):
         # Treat the third_party directories special
         # FIXME: Should probably support the `linguist-vendored` properties
         #  https://github.com/github/linguist/blob/master/docs/overrides.md
-        pattern = exclude_match(rpath, 'thirdparty')
+        pattern = exclude_match(rpath, 'third_party')
         if pattern:
-            finfo(rpath, 'Considering thirdparty as matches %r', pattern)
-            derrors = thirdparty_checks(rpath)
+            finfo(rpath, 'Considering third party as matches %r', pattern)
+            derrors = third_party_checks(rpath)
             if derrors:
                 for k, v in derrors.items():
                     assert k not in errors, (k, v, errors)
