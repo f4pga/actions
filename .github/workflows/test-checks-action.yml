@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier:	ISC
 
-name: Test
+name: SymbiFLow/checks action
 
 on:
   push:
@@ -15,6 +15,7 @@ on:
 jobs:
 
   ChecksPythonTests:
+    name: doctests
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +41,7 @@ jobs:
         pytest
 
   ChecksActionsTests:
-
+    name: Tests
     runs-on: ubuntu-latest
     steps:
     - name: Getting code
