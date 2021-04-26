@@ -295,6 +295,11 @@ LICENSE_FILES = [
     'COPYING',
 ]
 
+LICENSE_FILES_EXTENSIONS = [
+    '',
+    '.TXT',
+]
+
 
 def third_party_checks(pname):
     """Check a directory containing third party contents.
@@ -315,9 +320,12 @@ def third_party_checks(pname):
 
         license_files = []
         for lname in LICENSE_FILES:
-            lpath = dpath / lname
-            if lpath.exists():
-                license_files.append(lpath)
+            for lext in LICENSE_FILES_EXTENSIONS:
+                lname_ext = lname + lext
+                lpath = dpath / lname_ext
+
+                if lpath.exists():
+                    license_files.append(lpath)
 
         if not license_files:
             reldpath = relpath(dpath)
