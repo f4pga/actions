@@ -368,6 +368,12 @@ def detect_file_type(pname):
     if pname.match('*.sv'):
         return 'SystemVerilog'
 
+    if pname.match('*.spice'):
+        return 'Spice'
+
+    if pname.match('*.cdl'):
+        return 'Circuit Description Language'
+
     if pname.match('*.lef') or pname.match('*.def'):
         return 'Library Exchange Format'
 
