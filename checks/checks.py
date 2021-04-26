@@ -344,17 +344,32 @@ def detect_file_type(pname):
     if not pname.is_file():
         return None
 
+    # Scripting files
     if pname.match('*.py'):
-        return 'python'
-
-    if pname.match('Makefile') or pname.match('*.mk'):
-        return 'make'
-
-    if pname.match('*.yaml') or pname.match('*.yml'):
-        return 'yaml'
+        return 'Python'
 
     if pname.match('*.sh'):
-        return 'shell'
+        return 'Shell'
+
+    # Configuration files
+    if pname.match('*.yaml') or pname.match('*.yml'):
+        return 'Yaml'
+
+    if pname.match('*.xml'):
+        return 'XML'
+
+    if pname.match('Makefile') or pname.match('*.mk'):
+        return 'Make'
+
+    # Hardware files
+    if pname.match('*.v'):
+        return 'Verilog'
+
+    if pname.match('*.sv'):
+        return 'SystemVerilog'
+
+    if pname.match('*.lef') or pname.match('*.def'):
+        return 'Library Exchange Format'
 
     return None
 
@@ -386,8 +401,6 @@ class OutputGroup:
         if ON_GITHUB_ACTIONS:
             print('::endgroup::')
         print()
-
-
 
 
 def main(args):
@@ -449,7 +462,7 @@ def main(args):
             ferrors = []
             ferrors += license_checks(fpath)
 
-            if ftype == 'python':
+            if ftype == 'Python':
                 ferrors += python_checks(fpath)
 
             if ferrors:
