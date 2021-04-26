@@ -293,11 +293,14 @@ LICENSE_FILES = [
     'LICENSE',
     'LICENCE',
     'COPYING',
+    'COPYRIGHT',
 ]
 
 LICENSE_FILES_EXTENSIONS = [
     '',
     '.TXT',
+    '.txt',
+    '.md',
 ]
 
 
