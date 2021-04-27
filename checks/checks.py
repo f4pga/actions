@@ -299,8 +299,7 @@ LICENSE_FILES = [
 LICENSE_FILES_EXTENSIONS = [
     '',
     '.TXT',
-    '.txt',
-    '.md',
+    '.MD',
 ]
 
 
@@ -322,13 +321,14 @@ def third_party_checks(pname):
             continue
 
         license_files = []
-        for lname in LICENSE_FILES:
-            for lext in LICENSE_FILES_EXTENSIONS:
-                lname_ext = lname + lext
-                lpath = dpath / lname_ext
+        for fname in os.listdir(dpath):
+            for lname in LICENSE_FILES:
+                for lext in LICENSE_FILES_EXTENSIONS:
+                    lname_ext = lname + lext
 
-                if lpath.exists():
-                    license_files.append(lpath)
+                    if str(lname_ext).lower() == str(fname).lower():
+                        lpath = dpath / fname
+                        license_files.append(lpath)
 
         if not license_files:
             reldpath = relpath(dpath)
