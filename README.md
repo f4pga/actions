@@ -2,9 +2,59 @@
 
 This repository contains [actions](https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/introduction-to-github-actions#actions) to be reused in [GitHub Actions](https://github.com/features/actions) continuous integration [workflows](https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/introduction-to-github-actions#workflows), either for development purposes or by final users.
 
-✔️ [symbiflow/actions/checks](checks)
+## [symbiflow/actions/checks](checks)
 
 Runs license and python linting checks.
+
+## [symbiflow/actions/update_conda_lock](update_conda_lock)
+
+Simplifies maintaining Conda Locks, i.e. stable Conda environment files with precise Conda and Pip package versions based on a given Conda environment file.
+
+Running this action creates a Pull Request that creates or updates a Conda Lock.
+Checking workflow results and merging the Pull Request are the only actions that require repository maintainer's attention.
+
+Please bear in mind that the Pull Request can only trigger workflows if this action is used with GitHub's [Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+Always set such a token as [an encrypted secret](https://docs.github.com/en/actions/reference/encrypted-secrets) for security reasons.
+For example, after setting `NAME_OF_TOKEN_VAR` repository secret with *PAT*, use:
+```
+    steps:
+    - uses: symbiflow/actions/update_conda_lock@GIT_REVISION
+      with:
+        gh_access_token: ${{ secrets.NAME_OF_TOKEN_VAR }}
+```
+In case passing *PAT* is not an option, passing `secrets.GITHUB_TOKEN` will also result in creating a Pull Request but it won't trigger PR Checks.
+
+### Action inputs
+
+The inputs to this action are:
+* `branch_name_core` (default: `update-lock`):
+  * Name of the pushed branch; it will be suffixed with GH Action's Run ID.
+* `commit_message` (default: `[BOT] Bump Conda Lock`):
+  * Message of the commit updating Conda Lock.
+* `conda_lock_file` (default: `conda_lock.yml`):
+  * Path to the Conda Lock file (needs to have txt/yml/yaml extension).
+* `environment_file` (default: `environment.yml`):
+  * Path to the base `environment.yml` file.
+* **`gh_access_token` (required)**:
+  * GitHub Access Token; use Personal Access Token to trigger workflows when issuing the Pull Request.
+* `pr_title_core` (default: `[BOT] Bump Conda Lock`):
+  * Title of the Pull Request; it will be suffixed with UTC time and date.
+* `user_email` (default: `<>`):
+  * Email address of the user creating commit.
+* `user_name` (default: `CONDA_LOCK_UPDATING_BOT`):
+  * Name of the user creating commit.
+
+### Avoiding conflicts with inter-dependent git-based pip packages
+
+In certain circumstances pip, internally run when Conda creates the environment, might fail due to an alleged conflict in Conda Lock git-based packages.
+Until [the pip issue](https://github.com/pypa/pip/issues/10002) is fixed, it can be avoided by making pip install packages without their dependencies.
+With Conda Lock it's absolutely safe to do so since all pip packages, including the dependencies of packages specified directly, are always included in the Conda Lock.
+What's more, the package versions are all locked in Conda Lock so these dependencies can't change.
+
+Therefore currently the safest way to create Conda environment using the Conda Lock is:
+```
+env PIP_NO_DEPS="true" conda env create -f $CONDA_LOCK_FILE`
+```
 
 # Examples
 
