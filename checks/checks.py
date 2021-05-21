@@ -17,6 +17,8 @@ import pprint
 import re
 import sys
 import tempfile
+import subprocess
+import json
 
 
 __path__ = pathlib.Path(__file__).resolve().parent
@@ -417,6 +419,15 @@ def main(args):
     logging.debug('Starting search in: %s', root_dir)
 
     errors = {}
+
+    json_data = subprocess.check_output("github-linguist --json", shell=True).decode('utf8')
+    files_data = json.loads(json_data)
+
+    ftypes = {}
+    for ftype, fpaths in files_data.items():
+        for fpath in fpaths:
+            ftypes[fpath] = ftype
+
     for root, dirs, files in os.walk(root_dir):
         rpath = pathlib.Path(root).resolve()
         fdebug(rpath, 'Searching')
@@ -463,9 +474,9 @@ def main(args):
                 fwarn(fpath, 'Skipping nonfile')
                 continue
 
-            ftype = detect_file_type(fpath)
+            ftype = ftypes.get(os.path.relpath(fpath, root_dir), None)
             if ftype is None:
-                finfo(fpath, 'Skipping unknown file type')
+                finfo(fpath, 'Skipping generated or unknown file')
                 continue
 
             ferrors = []
