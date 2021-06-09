@@ -270,6 +270,10 @@ def license_check_spdx(filename, header_lines):
 
     >>> P = pathlib.Path
 
+    No license needed on __init__.py file if it is an empty file.
+    >>> python_check_shebang(P('__init__.py'), [])
+    []
+
     No SPDX line
     >>> license_check_spdx(P('__init__.py'), ['a', 'b', 'c'])
     ['Missing SPDX-License-Identifier line in header']
@@ -279,6 +283,9 @@ def license_check_spdx(filename, header_lines):
     []
 
     """
+    # Skip empty '__init__.py' files
+    if filename.match('__init__.py') and not header_lines:
+        return []
 
     spdx_id = "SPDX-License-Identifier"
 
