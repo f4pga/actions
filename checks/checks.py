@@ -121,6 +121,24 @@ def report_error(error_message):
     return [error_message]
 
 
+def shell_check_shebang(filename, header_lines):
+
+    # Need to have at least one line for the rest of the checks to fail.
+    while len(header_lines) < 1:
+        header_lines.append('')
+
+    shebang_lines = ['#!/bin/bash\n', '#! /bin/bash\n', '#!/usr/bin/env bash\n', '#! /usr/bin/env bash\n']
+    for shebang_line in shebang_lines:
+        if header_lines[0] == shebang_line:
+            return []
+
+    return report_file_error(
+        'Incorrect shebang (#!) line',
+        filename, 1,
+        shebang_lines[0], header_lines[0],
+    )
+
+
 def python_check_shebang(filename, header_lines):
     r"""Checks using correct python3 shebang line.
 
@@ -204,6 +222,23 @@ def python_check_coding(filename, header_lines):
         )
 
     return []
+
+
+def shell_checks(pname):
+    """Checks shell scripts are valid.
+
+    Checks performed:
+     * Has the correct shebang (`#!`) starting the file.
+    """
+    assert isinstance(pname, pathlib.Path), (pname, type(pname))
+    assert pname.is_file(), (pname, pname.stat())
+
+    fdebug(pname, 'Running shell checks.')
+    data = read_header(pname)
+
+    errors = []
+    errors += shell_check_shebang(pname, data)
+    return errors
 
 
 def python_checks(pname):
@@ -473,6 +508,9 @@ def main(args):
 
             if ftype == 'Python':
                 ferrors += python_checks(fpath)
+
+            if ftype == 'Shell':
+                ferrors += shell_checks(fpath)
 
             if ferrors:
                 errors[fpath] = ferrors
