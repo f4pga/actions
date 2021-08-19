@@ -1,0 +1,75 @@
+# Copyright (C) 2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier:	ISC
+
+name: 'Conda Lock Updating Action'
+description: 'Action Creates a Pull Request with Conda Lock Update'
+
+inputs:
+  commit_message:
+    description: 'Message of the bump commit'
+  user_name:
+    description: 'Name of the user creating commit'
+  user_email:
+    description: 'Email address of the user creating commit'
+  branch_name_core:
+    description: "Name of the pushed branch; it will be suffixed with GH Action's Run ID"
+  environment_file:
+    description: 'Path of the `environment.yml` file'
+  conda_lock_file:
+    description: 'Path of the Conda Lock file (needs to have txt/yml/yaml extension)'
+  pr_title_core:
+    description: 'Title of the Pull Request; it will be suffixed with UTC time and date'
+  gh_access_token:
+    description: 'GitHub Access Token; use Personal Access Token to trigger workflows when issuing the Pull Request.'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - shell: bash
+    run:   $GITHUB_ACTION_PATH/check_prepare_env.sh
+
+  - shell: bash
+    run: |
+      set -e
+      source $GITHUB_ACTION_PATH/helpers.sh
+
+      gstart "Set Environment Variables"
+      _pr_base="$(git branch --show-current)"
+      if [ "$_pr_base" = "" ]; then
+        echo "Capturing base branch failed! Has the repository been checked out?"
+        exit 1
+      fi
+      _branch_name_core="${{ inputs.branch_name_core }}"
+
+      function set_env {
+        echo "$1=${2:-$3}" >> $GITHUB_ENV
+      }
+      set_env BOT_CONDA_LOCK   "${{ inputs.conda_lock_file }}"    "conda_lock.yml"
+      set_env BOT_ENV_YML      "${{ inputs.environment_file }}"   "environment.yml"
+      set_env COMMIT_MESSAGE   "${{ inputs.commit_message }}"     "[BOT] Bump Conda Lock"
+      set_env PR_BASE          "$_pr_base"
+      set_env PR_HEAD          "${_branch_name_core:-update-lock}-$GITHUB_RUN_ID"
+      set_env PR_TITLE_CORE    "${{ inputs.pr_title_core }}"      "[BOT] Bump Conda Lock"
+      set_env USER_EMAIL       "${{ inputs.user_email }}"         "<>"
+      set_env USER_NAME        "${{ inputs.user_name }}"          "CONDA_LOCK_UPDATING_BOT"
+      gend
+
+  # Uses BOT_CONDA_LOCK, BOT_ENV_YML, COMMIT_MESSAGE, PR_HEAD, USER_EMAIL and USER_NAME
+  - shell: bash
+    run:   $GITHUB_ACTION_PATH/push_updated_lock.sh
+
+  - shell: bash
+    env:
+      GH_ACCESS_TOKEN: "${{ inputs.gh_access_token }}"
+    run: |
+      # It's `false` when the lock is up to date
+      if [ "$CONDA_LOCK_UPDATED" = "true" ]; then
+        # Uses GH_ACCESS_TOKEN, PR_BASE, PR_HEAD and PR_TITLE_CORE
+        python3 $GITHUB_ACTION_PATH/create_pull_request.py
+      fi
