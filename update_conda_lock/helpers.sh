@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Copyright (C) 2021  The SymbiFlow Authors.
 #
 # Use of this source code is governed by a ISC-style
