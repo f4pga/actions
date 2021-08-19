@@ -328,7 +328,7 @@ def lock_pip_dependencies(
             'w', delete=False)
     tmp_requirements_path = tmp_requirements_file.name
     try:
-        tmp_requirements_file.write('\n'.join(pip_deps))
+        tmp_requirements_file.write('\n'.join(all_pip_deps))
         tmp_requirements_file.close()
 
         # Paths in `requirements.txt` are relative to the `root_dir`
