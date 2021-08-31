@@ -42,7 +42,7 @@ gstart "Add And Commit Changes"
 git config user.name "$USER_NAME"
 git config user.email "$USER_EMAIL"
 git add "$BOT_CONDA_LOCK"
-git commit -m "$COMMIT_MESSAGE"
+git commit -sm "$COMMIT_MESSAGE"
 gend
 
 gstart "Push Changes"
