@@ -10,39 +10,15 @@ Runs license and python linting checks.
 
 Simplifies maintaining Conda Locks, i.e. stable Conda environment files with precise Conda and Pip package versions based on a given Conda environment file.
 
-Running this action creates a Pull Request that creates or updates a Conda Lock.
-Checking workflow results and merging the Pull Request are the only actions that require repository maintainer's attention.
-
-Please bear in mind that the Pull Request can only trigger workflows if this action is used with GitHub's [Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
-Always set such a token as [an encrypted secret](https://docs.github.com/en/actions/reference/encrypted-secrets) for security reasons.
-For example, after setting `NAME_OF_TOKEN_VAR` repository secret with *PAT*, use:
-```
-    steps:
-    - uses: symbiflow/actions/update_conda_lock@GIT_REVISION
-      with:
-        gh_access_token: ${{ secrets.NAME_OF_TOKEN_VAR }}
-```
-In case passing *PAT* is not an option, passing `secrets.GITHUB_TOKEN` will also result in creating a Pull Request but it won't trigger PR Checks.
+Running this action only updates the provided Conda Lock file, leaving to the caller action the creation of the Pull Request.
 
 ### Action inputs
 
 The inputs to this action are:
-* `branch_name_core` (default: `update-lock`):
-  * Name of the pushed branch; it will be suffixed with GH Action's Run ID.
-* `commit_message` (default: `[BOT] Bump Conda Lock`):
-  * Message of the commit updating Conda Lock.
 * `conda_lock_file` (default: `conda_lock.yml`):
   * Path to the Conda Lock file (needs to have txt/yml/yaml extension).
 * `environment_file` (default: `environment.yml`):
   * Path to the base `environment.yml` file.
-* **`gh_access_token` (required)**:
-  * GitHub Access Token; use Personal Access Token to trigger workflows when issuing the Pull Request.
-* `pr_title_core` (default: `[BOT] Bump Conda Lock`):
-  * Title of the Pull Request; it will be suffixed with UTC time and date.
-* `user_email` (default: `<>`):
-  * Email address of the user creating commit.
-* `user_name` (default: `CONDA_LOCK_UPDATING_BOT`):
-  * Name of the user creating commit.
 
 ### Avoiding conflicts with inter-dependent git-based pip packages
 
