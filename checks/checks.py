@@ -342,6 +342,8 @@ LICENSE_FILES_EXTENSIONS = [
     '',
     '.TXT',
     '.MD',
+    '-APACHE',
+    '-MIT',
 ]
 
 
