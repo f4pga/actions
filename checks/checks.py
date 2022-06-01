@@ -127,7 +127,16 @@ def shell_check_shebang(filename, header_lines):
     while len(header_lines) < 1:
         header_lines.append('')
 
-    shebang_lines = ['#!/bin/bash', '#! /bin/bash', '#!/usr/bin/env bash', '#! /usr/bin/env bash']
+    shebang_lines = [
+        '#!/bin/bash',
+        '#! /bin/bash',
+        '#!/usr/bin/env bash',
+        '#! /usr/bin/env bash',
+        '#!/bin/sh',
+        '#! /bin/sh',
+        '#!/usr/bin/env sh',
+        '#! /usr/bin/env sh'
+    ]
     for shebang_line in shebang_lines:
         if header_lines[0].startswith(shebang_line):
             return []
