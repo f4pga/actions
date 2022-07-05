@@ -1,7 +1,7 @@
 {
     "problemMatcher": [
         {
-            "owner": "symbiflow-checks",
+            "owner": "f4pga-checks",
             "pattern": [
                 {
                     "regexp": "^:([^ ]+) file=([^,]+),line=([^,]),col=([^:]+):(.*)$",

@@ -1,4 +1,4 @@
-# `SymbiFlow/actions/checks@main` - GitHub Action for basic SymbiFlow checks.
+# `F4PGA/actions/checks@main` - GitHub Action for basic F4PGA checks.
 
 This GitHub Actions performs a number of basic checks against a repository.
 
@@ -7,7 +7,7 @@ This GitHub Actions performs a number of basic checks against a repository.
 ```yaml
 
 jobs:
-  SymbiFlowBasicChecks:
+  F4PGABasicChecks:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +17,7 @@ jobs:
         submodules: recursive
 
     - name: Getting code
-      uses: SymbiFlow/actions/checks@main
+      uses: F4PGA/actions/checks@main
 ```
 
 # Checks
@@ -38,8 +38,7 @@ The checks are currently performed on the following files;
 
 ### Excluding files
 
-Files can be excluded from the license checks using the `exclude_license`
-input.
+Files can be excluded from the license checks using the `exclude_license` input.
 
 ### Third Party License Files
 
