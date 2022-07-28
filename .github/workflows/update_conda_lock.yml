@@ -28,9 +28,6 @@ on:
         default: 'environment.yml'
         type: string
     secrets:
-      SSH_DEPLOY_KEY:
-        description: 'SSH Key.'
-        required: true
       GH_TOKEN:
         description: 'GitHub Token.'
         required: true
@@ -49,7 +46,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: 'recursive'
-          ssh-key: ${{ secrets.SSH_DEPLOY_KEY }}
 
       - name: Update Conda Lock
         uses: f4pga/actions/update_conda_lock@main
