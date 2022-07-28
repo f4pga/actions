@@ -60,7 +60,7 @@ jobs:
           echo "::set-output name=changes::$RESULT";
 
       - name: Issue Pull Request
-        if: ${{ github.ref == 'refs/heads/main' && steps.check-diff.outputs.changes == 'true' }}
+        #if: ${{ github.ref == 'refs/heads/main' && steps.check-diff.outputs.changes == 'true' }}
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GH_TOKEN }}
