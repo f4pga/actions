@@ -47,7 +47,7 @@ runs:
         python -m zipfile -t $WHEEL
         python -m zipfile -l $WHEEL
         echo
-        if [ "$(uname)" = "Linux" -a $PYVER -eq 3 ]; then
+        if [ "$(uname)" = "Linux" -a $PYVER -eq 3 -a "${WHEEL: -8}" != "-any.whl" ]; then
           auditwheel show $WHEEL
         fi
         echo
