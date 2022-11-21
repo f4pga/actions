@@ -39,7 +39,7 @@ runs:
     if: inputs.type == 'wheels'
     shell: bash
     run: |
-      PYVER=$(python2 -c "import sys; print(sys.version[0])")
+      PYVER=$(python -c "import sys; print(sys.version[0])")
       for WHEEL in dist/*.whl; do
         echo
         echo "::group::Checking $WHEEL"
