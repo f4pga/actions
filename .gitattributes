@@ -1,0 +1,7 @@
+# Linguist - vendored override
+
+third_party/* linguist-vendored
+
+# Linguist - generated override
+
+checks/tests/license/test-missing-spdx-generated.v linguist-generated
