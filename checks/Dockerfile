@@ -1,4 +1,4 @@
-FROM python:slim-buster
+FROM python:slim
 
 # Install git
 RUN apt-get update -qq \
